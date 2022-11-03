@@ -9,7 +9,7 @@ query NodePools {
         minNodes
         maxNodes
         # @genqlient(typename: "Node")
-        nodes {
+        nodes(where: { nodePoolAssigned: { equals: true } }) {
             ID: id
             # @genqlient(typename: "Status")
             status {
@@ -36,7 +36,7 @@ mutation UpdateNodePool(
         minNodes
         maxNodes
         # @genqlient(typename: "Node")
-        nodes {
+        nodes(where: { nodePoolAssigned: { equals: true } }) {
             ID: id
             # @genqlient(typename: "Status")
             status {

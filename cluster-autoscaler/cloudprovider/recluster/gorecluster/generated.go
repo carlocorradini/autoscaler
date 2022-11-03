@@ -238,7 +238,7 @@ query NodePools {
 		count
 		minNodes
 		maxNodes
-		nodes {
+		nodes(where: {nodePoolAssigned:{equals:true}}) {
 			ID: id
 			status {
 				status
@@ -282,7 +282,7 @@ mutation UpdateNodePool ($id: ID!, $input: UpdateNodePoolInput!) {
 		count
 		minNodes
 		maxNodes
-		nodes {
+		nodes(where: {nodePoolAssigned:{equals:true}}) {
 			ID: id
 			status {
 				status

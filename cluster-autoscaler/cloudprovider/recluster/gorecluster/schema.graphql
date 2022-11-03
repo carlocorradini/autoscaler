@@ -598,13 +598,13 @@ type NodePool {
     """Data cursor"""
     cursor: ID
     """Order options"""
-    orderBy: OrderByNodePoolInput
+    orderBy: OrderByNodeInput
     """Skip data"""
     skip: NonNegativeInt! = 0
     """Take data"""
     take: Int! = 8
     """Filter options"""
-    where: WhereNodePoolInput
+    where: WhereNodeInput
   ): [Node!]!
   """Update timestamp"""
   updatedAt: Timestamp!
