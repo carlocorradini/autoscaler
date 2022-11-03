@@ -1,0 +1,1390 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+"""Protect the resource from unauthenticated and unauthorized access."""
+directive @auth(
+  """Allowed permissions to access the resource."""
+  permissions: [String!]! = []
+  """Allowed roles to access the resource."""
+  roles: [String!]! = []
+  """Applicant type."""
+  type: String!
+) on FIELD | FIELD_DEFINITION | OBJECT
+
+"""
+The `BigInt` scalar type represents non-fractional signed whole numeric values.
+"""
+scalar BigInt
+
+"""BigInt filter"""
+input BigIntFilter {
+  """BigInt equals"""
+  equals: BigInt
+  """BigInt is greater than"""
+  gt: BigInt
+  """BigInt is greater than or equal to"""
+  gte: BigInt
+  """BigInt exists in list"""
+  in: [BigInt!]
+  """BigInt is less than"""
+  lt: BigInt
+  """BigInt is less than or equal to"""
+  lte: BigInt
+  """BigInt not equals"""
+  not: BigIntFilter
+  """BigInt does not exists in list"""
+  notIn: [BigInt!]
+}
+
+"""Bool filter"""
+input BoolFilter {
+  """Bool equals"""
+  equals: Boolean
+  """Bool not equals"""
+  not: BoolFilter
+}
+
+"""Case sensitivities"""
+enum CaseSensitivityEnum {
+  """Case-Insensitive mode"""
+  CASE_INSENSITIVE
+  """Case-Sensitive mode"""
+  CASE_SENSITIVE
+}
+
+"""Cpu"""
+type Cpu {
+  """Cpu architecture"""
+  architecture: CpuArchitectureEnum!
+  """Cpu L1d cache"""
+  cacheL1d(
+    """Digital conversion unit"""
+    unit: DigitalUnitEnum! = B
+  ): Int!
+  """Cpu L1i cache"""
+  cacheL1i(
+    """Digital conversion unit"""
+    unit: DigitalUnitEnum! = B
+  ): Int!
+  """Cpu L2 cache"""
+  cacheL2(
+    """Digital conversion unit"""
+    unit: DigitalUnitEnum! = B
+  ): Int!
+  """Cpu L3 cache"""
+  cacheL3(
+    """Digital conversion unit"""
+    unit: DigitalUnitEnum! = B
+  ): Int!
+  """Cpu cores"""
+  cores: Int!
+  """Creation timestamp"""
+  createdAt: Timestamp!
+  """Cpu efficiency threshold"""
+  efficiencyThreshold: Int
+  """Cpu family"""
+  family: Int!
+  """Cpu flags"""
+  flags: [String!]!
+  """Cpu identifier"""
+  id: ID!
+  """Cpu model"""
+  model: Int!
+  """Cpu multi-thread score"""
+  multiThreadScore: Int!
+  """Cpu name"""
+  name: String!
+  """CPU nodes"""
+  nodes(
+    """Data cursor"""
+    cursor: ID
+    """Order options"""
+    orderBy: OrderByNodeInput
+    """Skip data"""
+    skip: NonNegativeInt! = 0
+    """Take data"""
+    take: Int! = 8
+    """Filter options"""
+    where: WhereNodeInput
+  ): [Node!]!
+  """Cpu performance threshold"""
+  performanceThreshold: Int
+  """Cpu single-thread score"""
+  singleThreadScore: Int!
+  """Update timestamp"""
+  updatedAt: Timestamp!
+  """Cpu vendor"""
+  vendor: CpuVendorEnum!
+  """Cpu vulnerabilities"""
+  vulnerabilities: [String!]!
+}
+
+"""Cpu architectures"""
+enum CpuArchitectureEnum {
+  """
+  64-bit version of the x86 instruction set. Also known as x64, x86-64, AMD64, and Intel 64
+  """
+  x86_64
+}
+
+"""Cpu architecture filter"""
+input CpuArchitectureEnumFilter {
+  """Cpu architecture equals"""
+  equals: CpuArchitectureEnum
+  """Cpu architecture exists in list"""
+  in: [CpuArchitectureEnum!]
+  """Cpu architecture not equals"""
+  not: CpuArchitectureEnumFilter
+  """Cpu architecture does not exists in list"""
+  notIn: [CpuArchitectureEnum!]
+}
+
+"""Cpu vendors"""
+enum CpuVendorEnum {
+  """Advanced Micro Devices"""
+  AMD
+  """Intel"""
+  INTEL
+}
+
+"""Cpu vendor filter"""
+input CpuVendorEnumFilter {
+  """Cpu vendor equals"""
+  equals: CpuVendorEnum
+  """Cpu vendor exists in list"""
+  in: [CpuVendorEnum!]
+  """Cpu vendor not equals"""
+  not: CpuVendorEnumFilter
+  """Cpu vendor does not exists in list"""
+  notIn: [CpuVendorEnum!]
+}
+
+"""Create Cpu input"""
+input CreateCpuInput {
+  """Cpu architecture"""
+  architecture: CpuArchitectureEnum!
+  """Cpu L1d cache"""
+  cacheL1d: PositiveInt!
+  """Cpu L1i cache"""
+  cacheL1i: PositiveInt!
+  """Cpu L2 cache"""
+  cacheL2: PositiveInt!
+  """Cpu L3 cache"""
+  cacheL3: PositiveInt!
+  """Cpu cores"""
+  cores: PositiveInt!
+  """Cpu efficiency threshold"""
+  efficiencyThreshold: PositiveInt
+  """Cpu family"""
+  family: PositiveInt!
+  """Cpu flags"""
+  flags: [NonEmptyString!]
+  """Cpu model"""
+  model: PositiveInt!
+  """Cpu multi-thread score"""
+  multiThreadScore: PositiveInt!
+  """Cpu name"""
+  name: NonEmptyString!
+  """Cpu performance threshold"""
+  performanceThreshold: PositiveInt
+  """Cpu single-thread score"""
+  singleThreadScore: PositiveInt!
+  """Cpu vendor"""
+  vendor: CpuVendorEnum!
+  """Cpu vulnerabilities"""
+  vulnerabilities: [NonEmptyString!]
+}
+
+"""Create Disk input"""
+input CreateDiskInput {
+  """Disk name"""
+  name: NonEmptyString!
+  """Disk size"""
+  size: BigInt!
+}
+
+"""Create Interface input"""
+input CreateInterfaceInput {
+  """Interface MAC address"""
+  address: MAC!
+  """Interface name"""
+  name: NonEmptyString!
+  """Interface speed"""
+  speed: BigInt!
+  """Interface Wake-on-Lan flags"""
+  wol: [WoLFlagEnum!]
+}
+
+"""Create Node input"""
+input CreateNodeInput {
+  """Node Cpu"""
+  cpu: CreateCpuInput!
+  """Node disks"""
+  disks: [CreateDiskInput!]!
+  """Node interfaces"""
+  interfaces: [CreateInterfaceInput!]!
+  """Maximum efficiency power consumption"""
+  maxEfficiencyPowerConsumption: PositiveInt
+  """Maximum power consumption"""
+  maxPowerConsumption: PositiveInt!
+  """Minimum performance power consumption"""
+  minPerformancePowerConsumption: PositiveInt
+  """Minimum power consumption"""
+  minPowerConsumption: PositiveInt!
+  """Node permissions"""
+  permissions: [NodePermissionEnum!]
+  """Node ram"""
+  ram: BigInt!
+  """Node roles"""
+  roles: [NodeRoleEnum!]!
+}
+
+"""Create User input"""
+input CreateUserInput {
+  """User password"""
+  password: NonEmptyString!
+  """User username"""
+  username: NonEmptyString!
+}
+
+"""Digital units"""
+enum DigitalUnitEnum {
+  """Byte"""
+  B
+  """Gigabyte"""
+  GB
+  """Gigabit"""
+  Gb
+  """Gibibyte"""
+  GiB
+  """Gibibit"""
+  Gib
+  """Kilobyte"""
+  KB
+  """Kilobit"""
+  Kb
+  """Kibibyte"""
+  KiB
+  """Kibibit"""
+  Kib
+  """Megabyte"""
+  MB
+  """Megabit"""
+  Mb
+  """Mebibyte"""
+  MiB
+  """Mebibit"""
+  Mib
+  """Petabyte"""
+  PB
+  """Petabit"""
+  Pb
+  """Pebibyte"""
+  PiB
+  """Pebibit"""
+  Pib
+  """Terabyte"""
+  TB
+  """Terabit"""
+  Tb
+  """Tebibyte"""
+  TiB
+  """Tebibit"""
+  Tib
+  """Bit"""
+  b
+}
+
+"""Disk"""
+type Disk {
+  """Creation timestamp"""
+  createdAt: Timestamp!
+  """Disk identifier"""
+  id: ID!
+  """Disk name"""
+  name: String!
+  """Disk node"""
+  node: Node!
+  """Disk size"""
+  size(
+    """Digital conversion unit"""
+    unit: DigitalUnitEnum! = B
+  ): BigInt!
+  """Update timestamp"""
+  updatedAt: Timestamp!
+}
+
+"""Integer filter"""
+input IntFilter {
+  """Integer equals"""
+  equals: Int
+  """Integer is greater than"""
+  gt: Int
+  """Integer is greater than or equal to"""
+  gte: Int
+  """Integer exists in list"""
+  in: [Int!]
+  """Integer is less than"""
+  lt: Int
+  """Integer is less than or equal to"""
+  lte: Int
+  """Integer not equals"""
+  not: IntFilter
+  """Integer does not exists in list"""
+  notIn: [Int!]
+}
+
+"""Integer nullable filter"""
+input IntNullableFilter {
+  """Integer equals"""
+  equals: Int
+  """Integer is greater than"""
+  gt: Int
+  """Integer is greater than or equal to"""
+  gte: Int
+  """Integer exists in list"""
+  in: [Int!]
+  """Integer is less than"""
+  lt: Int
+  """Integer is less than or equal to"""
+  lte: Int
+  """Integer not equals"""
+  not: IntNullableFilter
+  """Integer does not exists in list"""
+  notIn: [Int!]
+}
+
+"""Interface"""
+type Interface {
+  """Interface MAC address"""
+  address: String!
+  """Creation timestamp"""
+  createdAt: Timestamp!
+  """Interface identifier"""
+  id: ID!
+  """Interface name"""
+  name: String!
+  """Interface node"""
+  node: Node!
+  """Interface speed"""
+  speed(
+    """Digital conversion unit"""
+    unit: DigitalUnitEnum! = b
+  ): BigInt!
+  """Update timestamp"""
+  updatedAt: Timestamp!
+  """Interface Wake-on-Lan flags"""
+  wol: [WoLFlagEnum!]!
+}
+
+"""
+A field whose value is a JSON Web Token (JWT): https://jwt.io/introduction.
+"""
+scalar JWT
+
+"""
+A field whose value is a IEEE 802 48-bit MAC address: https://en.wikipedia.org/wiki/MAC_address.
+"""
+scalar MAC
+
+type Mutation {
+  """Create a new node"""
+  createNode(
+    """Node data"""
+    data: CreateNodeInput!
+  ): JWT!
+  """Create a new user"""
+  createUser(
+    """User data"""
+    data: CreateUserInput!
+  ): User!
+  """Delete Node from Node pool"""
+  deleteNodePoolNode(
+    """Node pool identifier"""
+    id: ID!
+    """Node identifier"""
+    nodeId: ID!
+  ): Node!
+  """Sign in user"""
+  signIn(
+    """User password"""
+    password: NonEmptyString!
+    """User username"""
+    username: NonEmptyString!
+  ): JWT!
+  """Update Node pool"""
+  updateNodePool(
+    """Node pool data"""
+    data: UpdateNodePoolInput!
+    """Node pool identifier"""
+    id: ID!
+  ): NodePool!
+  """Update Status"""
+  updateStatus: Status!
+}
+
+"""Nested string filter"""
+input NestedStringFilter {
+  """String contains"""
+  contains: String
+  """String ends with"""
+  endsWith: String
+  """String equals"""
+  equals: String
+  """String is greater than"""
+  gt: String
+  """String is greater than or equal to"""
+  gte: String
+  """String exists in list"""
+  in: [String!]
+  """String is less than"""
+  lt: String
+  """String is less than or equal to"""
+  lte: String
+  """String not equals"""
+  not: NestedStringFilter
+  """String does not exists in list"""
+  notIn: [String!]
+  """String starts with"""
+  startsWith: String
+}
+
+"""SNested string nullable filter"""
+input NestedStringNullableFilter {
+  """String contains"""
+  contains: String
+  """String ends with"""
+  endsWith: String
+  """String equals"""
+  equals: String
+  """String is greater than"""
+  gt: String
+  """String is greater than or equal to"""
+  gte: String
+  """String exists in list"""
+  in: [String!]
+  """String is less than"""
+  lt: String
+  """String is less than or equal to"""
+  lte: String
+  """String not equals"""
+  not: NestedStringNullableFilter
+  """String does not exists in list"""
+  notIn: [String!]
+  """String starts with"""
+  startsWith: String
+}
+
+"""Nested UUID filter"""
+input NestedUuidFilter {
+  """UUID equals"""
+  equals: UUID
+  """UUID is greater than"""
+  gt: UUID
+  """UUID is greater than or equal to"""
+  gte: UUID
+  """UUID exists in list"""
+  in: [UUID!]
+  """UUID is less than"""
+  lt: UUID
+  """UUID is less than or equal to"""
+  lte: UUID
+  """UUID not equals"""
+  not: NestedUuidFilter
+  """UUID does not exists in list"""
+  notIn: [UUID!]
+}
+
+"""Node"""
+type Node {
+  """Node CPU"""
+  cpu: Cpu!
+  """Creation timestamp"""
+  createdAt: Timestamp!
+  """Node disks"""
+  disks(
+    """Data cursor"""
+    cursor: ID
+    """Order options"""
+    orderBy: OrderByDiskInput
+    """Skip data"""
+    skip: NonNegativeInt! = 0
+    """Take data"""
+    take: Int! = 8
+    """Filter options"""
+    where: WhereDiskInput
+  ): [Disk!]!
+  """Node identifier"""
+  id: ID!
+  """Node interfaces"""
+  interfaces(
+    """Data cursor"""
+    cursor: ID
+    """Order options"""
+    orderBy: OrderByInterfaceInput
+    """Skip data"""
+    skip: NonNegativeInt! = 0
+    """Take data"""
+    take: Int! = 8
+    """Filter options"""
+    where: WhereInterfaceInput
+  ): [Interface!]!
+  """Maximum efficiency power consumption"""
+  maxEfficiencyPowerConsumption: Int
+  """Maximum power consumption"""
+  maxPowerConsumption: Int!
+  """Minimum performance power consumption"""
+  minPerformancePowerConsumption: Int
+  """Minimum power consumption"""
+  minPowerConsumption: Int!
+  """Node Node pool"""
+  nodePool: NodePool
+  """Node assigned to Node pool"""
+  nodePoolAssigned: Boolean!
+  """Node permissions"""
+  permissions: [NodePermissionEnum!]!
+  """Node ram"""
+  ram(
+    """Digital conversion unit"""
+    unit: DigitalUnitEnum! = B
+  ): BigInt!
+  """Node roles"""
+  roles: [NodeRoleEnum!]!
+  """Node status"""
+  status: Status!
+  """Update timestamp"""
+  updatedAt: Timestamp!
+}
+
+"""Node permissions"""
+enum NodePermissionEnum {
+  UNKNOWN
+}
+
+"""Node permissions filter"""
+input NodePermissionEnumListFilter {
+  """List matches the given Node permission list exactly"""
+  equals: [NodePermissionEnum!]
+  """Node permissions exists in the list"""
+  has: NodePermissionEnum
+  """Every Node permission exists in the list"""
+  hasEvery: [NodePermissionEnum!]
+  """At least one Node permission exists in the list"""
+  hasSome: [NodePermissionEnum!]
+  """List is empty"""
+  isEmpty: Boolean
+}
+
+"""Node pool"""
+type NodePool {
+  """Node pool auto scale flag"""
+  autoScale: Boolean!
+  """Node pool node count"""
+  count: Int!
+  """Creation timestamp"""
+  createdAt: Timestamp!
+  """Node pool identifier"""
+  id: ID!
+  """Node pool maximum number of nodes"""
+  maxNodes: Int!
+  """Node pool minimum number of nodes"""
+  minNodes: Int!
+  """Node pool name"""
+  name: String!
+  """Node pool nodes"""
+  nodes(
+    """Data cursor"""
+    cursor: ID
+    """Order options"""
+    orderBy: OrderByNodePoolInput
+    """Skip data"""
+    skip: NonNegativeInt! = 0
+    """Take data"""
+    take: Int! = 8
+    """Filter options"""
+    where: WhereNodePoolInput
+  ): [Node!]!
+  """Update timestamp"""
+  updatedAt: Timestamp!
+}
+
+"""Node roles"""
+enum NodeRoleEnum {
+  """K8s master"""
+  K8S_MASTER
+  """K8s worker"""
+  K8S_WORKER
+  """reCluster master"""
+  RECLUSTER_MASTER
+}
+
+"""Node roles filter"""
+input NodeRoleEnumListFilter {
+  """List matches the given Node role list exactly"""
+  equals: [NodeRoleEnum!]
+  """Node role exists in the list"""
+  has: NodeRoleEnum
+  """Every Node role exists in the list"""
+  hasEvery: [NodeRoleEnum!]
+  """At least one Node role exists in the list"""
+  hasSome: [NodeRoleEnum!]
+  """List is empty"""
+  isEmpty: Boolean
+}
+
+"""Node statuses"""
+enum NodeStatusEnum {
+  """Node is active"""
+  ACTIVE
+  """Node is active but not healthy and is not accepting pods"""
+  ACTIVE_NOT_READY
+  """Node is active, healthy and ready to accept pods"""
+  ACTIVE_READY
+  """Node is inactive"""
+  INACTIVE
+  """Unknown"""
+  UNKNOWN
+}
+
+"""Node status filter"""
+input NodeStatusEnumFilter {
+  """Node status equals"""
+  equals: NodeStatusEnum
+  """Node status exists in list"""
+  in: [NodeStatusEnum!]
+  """Node status not equals"""
+  not: NodeStatusEnumFilter
+  """Node status does not exists in list"""
+  notIn: [NodeStatusEnum!]
+}
+
+"""A string that cannot be passed as an empty value"""
+scalar NonEmptyString
+
+"""Integers that will have a value of 0 or more."""
+scalar NonNegativeInt
+
+"""Cpu order by input"""
+input OrderByCpuInput {
+  """Cpu architecture"""
+  architecture: SortOrderEnum
+  """Cpu L1d cache"""
+  cacheL1d: SortOrderEnum
+  """Cpu L1i cache"""
+  cacheL1i: SortOrderEnum
+  """Cpu L2 cache"""
+  cacheL2: SortOrderEnum
+  """Cpu L3 cache"""
+  cacheL3: SortOrderEnum
+  """Cpu cores"""
+  cores: SortOrderEnum
+  """Creation timestamp"""
+  createdAt: SortOrderEnum
+  """Cpu efficiency threshold"""
+  efficiencyThreshold: SortOrderEnum
+  """Cpu family"""
+  family: SortOrderEnum
+  """Cpu flags"""
+  flags: SortOrderEnum
+  """Cpu identifier"""
+  id: SortOrderEnum
+  """Cpu model"""
+  model: SortOrderEnum
+  """Cpu multi-thread score"""
+  multiThreadScore: SortOrderEnum
+  """Cpu name"""
+  name: SortOrderEnum
+  """Cpu performance threshold"""
+  performanceThreshold: SortOrderEnum
+  """Cpu single-thread score"""
+  singleThreadScore: SortOrderEnum
+  """Update timestamp"""
+  updatedAt: SortOrderEnum
+  """Cpu vendor"""
+  vendor: SortOrderEnum
+  """Cpu identifier"""
+  vulnerabilities: SortOrderEnum
+}
+
+"""Disk order by input"""
+input OrderByDiskInput {
+  """Creation timestamp"""
+  createdAt: SortOrderEnum
+  """Disk identifier"""
+  id: SortOrderEnum!
+  """Disk name"""
+  name: SortOrderEnum!
+  """Node identifier"""
+  nodeId: SortOrderEnum!
+  """Disk size"""
+  size: SortOrderEnum!
+  """Update timestamp"""
+  updatedAt: SortOrderEnum
+}
+
+"""Interface order by input"""
+input OrderByInterfaceInput {
+  """Interface MAC address"""
+  address: SortOrderEnum!
+  """Creation timestamp"""
+  createdAt: SortOrderEnum
+  """Interface identifier"""
+  id: SortOrderEnum!
+  """Interface name"""
+  name: SortOrderEnum!
+  """Node identifier"""
+  nodeId: SortOrderEnum!
+  """Interface speed"""
+  speed: SortOrderEnum!
+  """Update timestamp"""
+  updatedAt: SortOrderEnum
+  """Interface Wake-on-Lan flags"""
+  wol: SortOrderEnum!
+}
+
+"""Node order by input"""
+input OrderByNodeInput {
+  """Cpu identifier"""
+  cpuId: SortOrderEnum
+  """Creation timestamp"""
+  createdAt: SortOrderEnum
+  """Node identifier"""
+  id: SortOrderEnum
+  """Maximum efficiency power consumption"""
+  maxEfficiencyPowerConsumption: SortOrderEnum
+  """Maximum power consumption"""
+  maxPowerConsumption: SortOrderEnum
+  """Minimum performance power consumption"""
+  minPerformancePowerConsumption: SortOrderEnum
+  """Minimum power consumption"""
+  minPowerConsumption: SortOrderEnum
+  """Node assigned to Node pool"""
+  nodePoolAssigned: SortOrderEnum
+  """Node pool identifier"""
+  nodePoolId: SortOrderEnum
+  """Node permissions"""
+  permissions: SortOrderEnum
+  """Node ram"""
+  ram: SortOrderEnum
+  """Node roles"""
+  roles: SortOrderEnum
+  """Update timestamp"""
+  updatedAt: SortOrderEnum
+}
+
+"""Node pool order by input"""
+input OrderByNodePoolInput {
+  """Node pool auto scale flag"""
+  autoScale: SortOrderEnum
+  """Creation timestamp"""
+  createdAt: SortOrderEnum
+  """Node pool identifier"""
+  id: SortOrderEnum
+  """Node pool minimum number of nodes"""
+  minNodes: SortOrderEnum
+  """Node pool name"""
+  name: SortOrderEnum
+  """Update timestamp"""
+  updatedAt: SortOrderEnum
+}
+
+"""Status order by input"""
+input OrderByStatusInput {
+  """Status identifier"""
+  id: SortOrderEnum
+  """Last heartbeat timestamp"""
+  lastHeartbeat: SortOrderEnum
+  """Last transition timestamp"""
+  lastTransition: SortOrderEnum
+  """Status message"""
+  message: SortOrderEnum
+  """Status reason"""
+  reason: SortOrderEnum
+  """Status"""
+  status: SortOrderEnum
+  """Update timestamp"""
+  updatedAt: SortOrderEnum
+}
+
+"""User order by input"""
+input OrderByUserInput {
+  """Creation timestamp"""
+  createdAt: SortOrderEnum
+  """User identifier"""
+  id: SortOrderEnum
+  """User permissions"""
+  permissions: SortOrderEnum
+  """User roles"""
+  roles: SortOrderEnum
+  """Update timestamp"""
+  updatedAt: SortOrderEnum
+  """User username"""
+  username: SortOrderEnum
+}
+
+"""Integers that will have a value greater than 0."""
+scalar PositiveInt
+
+type Query {
+  """Cpu matching the identifier"""
+  cpu(
+    """Cpu identifier"""
+    id: ID!
+  ): Cpu
+  """List of Cpus"""
+  cpus(
+    """Data cursor"""
+    cursor: ID
+    """Order options"""
+    orderBy: OrderByCpuInput
+    """Skip data"""
+    skip: NonNegativeInt! = 0
+    """Take data"""
+    take: Int! = 8
+    """Filter options"""
+    where: WhereCpuInput
+  ): [Cpu!]!
+  """Disk matching the identifier"""
+  disk(
+    """Disk identifier"""
+    id: ID!
+  ): Disk
+  """List of Disks"""
+  disks(
+    """Data cursor"""
+    cursor: ID
+    """Order options"""
+    orderBy: OrderByDiskInput
+    """Skip data"""
+    skip: NonNegativeInt! = 0
+    """Take data"""
+    take: Int! = 8
+    """Filter options"""
+    where: WhereDiskInput
+  ): [Disk!]!
+  """Interface matching the identifier"""
+  interface(
+    """Interface identifier"""
+    id: ID!
+  ): Interface
+  """List of Interfaces"""
+  interfaces(
+    """Data cursor"""
+    cursor: ID
+    """Order options"""
+    orderBy: OrderByInterfaceInput
+    """Skip data"""
+    skip: NonNegativeInt! = 0
+    """Take data"""
+    take: Int! = 8
+    """Filter options"""
+    where: WhereInterfaceInput
+  ): [Interface!]!
+  """Node matching the identifier"""
+  node(
+    """Node identifier"""
+    id: ID!
+  ): Node
+  """Node pool matching the identifier"""
+  nodePool(
+    """Node pool identifier"""
+    id: ID!
+  ): NodePool
+  """List of Node pools"""
+  nodePools(
+    """Data cursor"""
+    cursor: ID
+    """Order options"""
+    orderBy: OrderByNodePoolInput
+    """Skip data"""
+    skip: NonNegativeInt! = 0
+    """Take data"""
+    take: Int! = 8
+    """Filter options"""
+    where: WhereNodePoolInput
+  ): [NodePool!]!
+  """List of nodes"""
+  nodes(
+    """Data cursor"""
+    cursor: ID
+    """Order options"""
+    orderBy: OrderByNodeInput
+    """Skip data"""
+    skip: NonNegativeInt! = 0
+    """Take data"""
+    take: Int! = 8
+    """Filter options"""
+    where: WhereNodeInput
+  ): [Node!]!
+  """Status matching the identifier"""
+  status(
+    """Status identifier"""
+    id: ID!
+  ): Status
+  """List of Statuses"""
+  statuses(
+    """Data cursor"""
+    cursor: ID
+    """Order options"""
+    orderBy: OrderByStatusInput
+    """Skip data"""
+    skip: NonNegativeInt! = 0
+    """Take data"""
+    take: Int! = 8
+    """Filter options"""
+    where: WhereStatusInput
+  ): [Status!]!
+  """User matching the identifier"""
+  user(
+    """User identifier"""
+    id: ID
+    """User username"""
+    username: NonEmptyString
+  ): User
+  """List of Users"""
+  users(
+    """Data cursor"""
+    cursor: ID
+    """Order options"""
+    orderBy: OrderByUserInput
+    """Skip data"""
+    skip: NonNegativeInt! = 0
+    """Take data"""
+    take: Int! = 8
+    """Filter options"""
+    where: WhereUserInput
+  ): [User!]!
+}
+
+"""Sort orders"""
+enum SortOrderEnum {
+  """Ascending order"""
+  ASC
+  """Descending order"""
+  DESC
+}
+
+"""Status"""
+type Status {
+  """Status identifier"""
+  id: ID!
+  """Last heartbeat timestamp"""
+  lastHeartbeat: Timestamp
+  """Last transition timestamp"""
+  lastTransition: Timestamp!
+  """Status message"""
+  message: String
+  """Status node"""
+  node: Node!
+  """Status reason"""
+  reason: String
+  """Status"""
+  status: NodeStatusEnum!
+  """Update timestamp"""
+  updatedAt: Timestamp!
+}
+
+"""String filter"""
+input StringFilter {
+  """String contains"""
+  contains: String
+  """String ends with"""
+  endsWith: String
+  """String equals"""
+  equals: String
+  """String is greater than"""
+  gt: String
+  """String is greater than or equal to"""
+  gte: String
+  """String exists in list"""
+  in: [String!]
+  """String is less than"""
+  lt: String
+  """String is less than or equal to"""
+  lte: String
+  """Case sensitivity"""
+  mode: CaseSensitivityEnum
+  """String not equals"""
+  not: NestedStringFilter
+  """String does not exists in list"""
+  notIn: [String!]
+  """String starts with"""
+  startsWith: String
+}
+
+"""String list filter"""
+input StringListFilter {
+  """List matches the given string list exactly"""
+  equals: [String!]
+  """String exists in the list"""
+  has: String
+  """Every string exists in the list"""
+  hasEvery: [String!]
+  """At least one string exists in the list"""
+  hasSome: [String!]
+  """List is empty"""
+  isEmpty: Boolean
+}
+
+"""String nullable filter"""
+input StringNullableFilter {
+  """String contains"""
+  contains: String
+  """String ends with"""
+  endsWith: String
+  """String equals"""
+  equals: String
+  """String is greater than"""
+  gt: String
+  """String is greater than or equal to"""
+  gte: String
+  """String exists in list"""
+  in: [String!]
+  """String is less than"""
+  lt: String
+  """String is less than or equal to"""
+  lte: String
+  """Case sensitivity"""
+  mode: CaseSensitivityEnum
+  """String not equals"""
+  not: NestedStringNullableFilter
+  """String does not exists in list"""
+  notIn: [String!]
+  """String starts with"""
+  startsWith: String
+}
+
+"""
+The javascript `Date` as integer. Type represents date and time as number of milliseconds from start of UNIX epoch.
+"""
+scalar Timestamp
+
+"""Timestamp filter"""
+input TimestampFilter {
+  """Timestamp equals"""
+  equals: Timestamp
+  """Timestamp is greater than"""
+  gt: Timestamp
+  """Timestamp is greater than or equal to"""
+  gte: Timestamp
+  """Timestamp exists in list"""
+  in: [Timestamp!]
+  """Timestamp is less than"""
+  lt: Timestamp
+  """Timestamp is less than or equal to"""
+  lte: Timestamp
+  """Timestamp not equals"""
+  not: TimestampFilter
+  """Timestamp does not exists in list"""
+  notIn: [Timestamp!]
+}
+
+"""Timestamp nullable filter"""
+input TimestampNullableFilter {
+  """Timestamp equals"""
+  equals: Timestamp
+  """Timestamp is greater than"""
+  gt: Timestamp
+  """Timestamp is greater than or equal to"""
+  gte: Timestamp
+  """Timestamp exists in list"""
+  in: [Timestamp!]
+  """Timestamp is less than"""
+  lt: Timestamp
+  """Timestamp is less than or equal to"""
+  lte: Timestamp
+  """Timestamp not equals"""
+  not: TimestampNullableFilter
+  """Timestamp does not exists in list"""
+  notIn: [Timestamp!]
+}
+
+"""
+A field whose value is a generic Universally Unique Identifier: https://en.wikipedia.org/wiki/Universally_unique_identifier.
+"""
+scalar UUID
+
+"""Update Node pool input"""
+input UpdateNodePoolInput {
+  """Node pool auto scale flag"""
+  autoScale: Boolean
+  """Node pool node count"""
+  count: PositiveInt
+  """Node pool minimum number of nodes"""
+  minNodes: PositiveInt
+  """Node pool name"""
+  name: NonEmptyString
+}
+
+"""User"""
+type User {
+  """Creation timestamp"""
+  createdAt: Timestamp!
+  """User identifier"""
+  id: ID!
+  """User permissions"""
+  permissions: [UserPermissionEnum!]!
+  """User roles"""
+  roles: [UserRoleEnum!]!
+  """Update timestamp"""
+  updatedAt: Timestamp!
+  """User username"""
+  username: String!
+}
+
+"""User permissions"""
+enum UserPermissionEnum {
+  UNKNOWN
+}
+
+"""User permissions filter"""
+input UserPermissionEnumListFilter {
+  """List matches the given User permission list exactly"""
+  equals: [UserPermissionEnum!]
+  """User permissions exists in the list"""
+  has: UserPermissionEnum
+  """Every User permission exists in the list"""
+  hasEvery: [UserPermissionEnum!]
+  """At least one User permission exists in the list"""
+  hasSome: [UserPermissionEnum!]
+  """List is empty"""
+  isEmpty: Boolean
+}
+
+"""User roles"""
+enum UserRoleEnum {
+  """Administrator"""
+  ADMIN
+  """Simple"""
+  SIMPLE
+}
+
+"""User roles filter"""
+input UserRoleEnumListFilter {
+  """List matches the given User role list exactly"""
+  equals: [UserRoleEnum!]
+  """User role exists in the list"""
+  has: UserRoleEnum
+  """Every User role exists in the list"""
+  hasEvery: [UserRoleEnum!]
+  """At least one User role exists in the list"""
+  hasSome: [UserRoleEnum!]
+  """List is empty"""
+  isEmpty: Boolean
+}
+
+"""UUID filter"""
+input UuidFilter {
+  """UUID equals"""
+  equals: UUID
+  """UUID is greater than"""
+  gt: UUID
+  """UUID is greater than or equal to"""
+  gte: UUID
+  """UUID exists in list"""
+  in: [UUID!]
+  """UUID is less than"""
+  lt: UUID
+  """UUID is less than or equal to"""
+  lte: UUID
+  """Case sensitivity"""
+  mode: CaseSensitivityEnum
+  """UUID not equals"""
+  not: NestedUuidFilter
+  """UUID does not exists in list"""
+  notIn: [UUID!]
+}
+
+"""Cpu where input"""
+input WhereCpuInput {
+  """Cpu architecture"""
+  architecture: CpuArchitectureEnumFilter
+  """Cpu L1d cache"""
+  cacheL1d: IntFilter
+  """Cpu L1i cache"""
+  cacheL1i: IntFilter
+  """Cpu L2 cache"""
+  cacheL2: IntFilter
+  """Cpu L3 cache"""
+  cacheL3: IntFilter
+  """Cpu cores"""
+  cores: IntFilter
+  """Creation timestamp"""
+  createdAt: TimestampFilter
+  """Cpu efficiency threshold"""
+  efficiencyThreshold: IntNullableFilter
+  """Cpu family"""
+  family: IntFilter
+  """Cpu flags"""
+  flags: StringListFilter
+  """Cpu identifier"""
+  id: UuidFilter
+  """Cpu model"""
+  model: IntFilter
+  """Cpu multi-thread score"""
+  multiThreadScore: IntFilter
+  """Cpu name"""
+  name: StringFilter
+  """Cpu performance threshold"""
+  performanceThreshold: IntNullableFilter
+  """Cpu single-thread score"""
+  singleThreadScore: IntFilter
+  """Update timestamp"""
+  updatedAt: TimestampFilter
+  """Cpu vendor"""
+  vendor: CpuVendorEnumFilter
+  """Cpu vulnerabilities"""
+  vulnerabilities: StringListFilter
+}
+
+"""Disk where input"""
+input WhereDiskInput {
+  """Creation timestamp"""
+  createdAt: TimestampFilter
+  """Disk identifier"""
+  id: UuidFilter
+  """Disk name"""
+  name: StringFilter
+  """Node identifier"""
+  nodeId: StringFilter
+  """Disk size"""
+  size: BigIntFilter
+  """Update timestamp"""
+  updatedAt: TimestampFilter
+}
+
+"""Interface where input"""
+input WhereInterfaceInput {
+  """Interface MAC address"""
+  address: StringFilter
+  """Creation timestamp"""
+  createdAt: TimestampFilter
+  """Interface identifier"""
+  id: UuidFilter
+  """Interface name"""
+  name: StringFilter
+  """Node identifier"""
+  nodeId: StringFilter
+  """Interface speed"""
+  speed: BigIntFilter
+  """Update timestamp"""
+  updatedAt: TimestampFilter
+  """Interface Wake-on-Lan flags"""
+  wol: WoLFlagEnumListFilter
+}
+
+"""Node where input"""
+input WhereNodeInput {
+  """Cpu identifier"""
+  cpuId: UuidFilter
+  """Creation timestamp"""
+  createdAt: TimestampFilter
+  """Node identifier"""
+  id: UuidFilter
+  """Maximum efficiency power consumption"""
+  maxEfficiencyPowerConsumption: IntNullableFilter
+  """Maximum power consumption"""
+  maxPowerConsumption: IntFilter
+  """Minimum performance power consumption"""
+  minPerformancePowerConsumption: IntNullableFilter
+  """Minimum power consumption"""
+  minPowerConsumption: IntFilter
+  """Node assigned to Node pool"""
+  nodePoolAssigned: BoolFilter
+  """Node pool identifier"""
+  nodePoolId: UuidFilter
+  """Node permissions"""
+  permissions: NodePermissionEnumListFilter
+  """Node ram"""
+  ram: BigIntFilter
+  """Node roles"""
+  roles: NodeRoleEnumListFilter
+  """Update timestamp"""
+  updatedAt: TimestampFilter
+}
+
+"""Node pool where input"""
+input WhereNodePoolInput {
+  """Node pool auto scale flag"""
+  autoScale: BoolFilter
+  """Creation timestamp"""
+  createdAt: TimestampFilter
+  """Node pool identifier"""
+  id: UuidFilter
+  """Node pool minimum number of nodes"""
+  minNodes: IntFilter
+  """Node pool name"""
+  name: StringFilter
+  """Update timestamp"""
+  updatedAt: TimestampFilter
+}
+
+"""Status where input"""
+input WhereStatusInput {
+  """Status identifier"""
+  id: UuidFilter
+  """Last heartbeat timestamp"""
+  lastHeartbeat: TimestampNullableFilter
+  """Last transition timestamp"""
+  lastTransition: TimestampFilter
+  """Status message"""
+  message: StringNullableFilter
+  """Status reason"""
+  reason: StringNullableFilter
+  """Status"""
+  status: NodeStatusEnumFilter
+  """Update timestamp"""
+  updatedAt: TimestampFilter
+}
+
+"""User where input"""
+input WhereUserInput {
+  """Creation timestamp"""
+  createdAt: TimestampFilter
+  """User identifier"""
+  id: UuidFilter
+  """User permissions"""
+  permissions: UserPermissionEnumListFilter
+  """User roles"""
+  roles: UserRoleEnumListFilter
+  """Update timestamp"""
+  updatedAt: TimestampFilter
+  """User username"""
+  username: StringFilter
+}
+
+"""Wake-on-Lan flags"""
+enum WoLFlagEnum {
+  """Wake on ARP"""
+  a
+  """Wake on broadcast messages"""
+  b
+  """Disable"""
+  d
+  """Wake on MagicPacket"""
+  g
+  """Wake on multicast messages"""
+  m
+  """Wake on PHY activity"""
+  p
+  """Enable SecureOn password for MagicPacket"""
+  s
+  """Wake on unicast messages"""
+  u
+}
+
+"""Interface Wake-on-Lan flags filter"""
+input WoLFlagEnumListFilter {
+  """List matches the given Wake-on-Lan flag list exactly"""
+  equals: [WoLFlagEnum!]
+  """Wake-on-Lan flag exists in the list"""
+  has: WoLFlagEnum
+  """Every Wake-on-Lan flag exists in the list"""
+  hasEvery: [WoLFlagEnum!]
+  """At least one Wake-on-Lan flag exists in the list"""
+  hasSome: [WoLFlagEnum!]
+  """List is empty"""
+  isEmpty: Boolean
+}
