@@ -88,10 +88,10 @@ func (r *reclusterCloudProvider) NodeGroupForNode(node *apiv1.Node) (cloudprovid
 		return nil, err
 	}
 
-	klog.V(5).Infof("Searching node group for node %q", nodeID)
+	klog.V(4).Infof("Searching node group for node %q", nodeID)
 
 	for _, nodeGroup := range r.manager.nodeGroups {
-		klog.V(5).Infof("Iterating node group %q", nodeGroup.Id())
+		klog.V(4).Infof("Iterating node group %q", nodeGroup.Id())
 
 		nodes, err := nodeGroup.Nodes()
 		if err != nil {
@@ -159,10 +159,15 @@ func (r *reclusterCloudProvider) Refresh() error {
 
 // toNodeID returns the node ID of the given node.
 func toNodeID(node *apiv1.Node) (string, error) {
-	klog.V(6).Infof("%+v", node)
-
 	nodeID, ok := node.Labels[nodeIDLabel]
 	if !ok {
+		// Check fake node
+		_, ok = node.Labels["k8s.io/cluster-autoscaler/fake-node-reason"]
+		if ok {
+			// Node ID is ProviderID
+			return node.Spec.ProviderID, nil
+		}
+
 		return "", fmt.Errorf("node ID label %q is missing from node %q with provider ID %q", nodeIDLabel, node.Name, node.Spec.ProviderID)
 	}
 
