@@ -1,0 +1,66 @@
+# @genqlient(omitempty: true)
+query NodePools {
+    # @genqlient(typename: "NodePool")
+    nodePools {
+        ID: id
+        name
+        autoScale
+        count
+        minNodes
+        maxNodes
+        # @genqlient(typename: "Node")
+        nodes(where: { nodePoolAssigned: { equals: true } }) {
+            ID: id
+            # @genqlient(typename: "Status")
+            status {
+                status
+                message
+            }
+        }
+        createdAt
+        updatedAt
+    }
+}
+
+# @genqlient(omitempty: true)
+mutation UpdateNodePool(
+    $id: ID!,
+    $input: UpdateNodePoolInput!
+) {
+    # @genqlient(typename: "NodePool")
+    updateNodePool(id: $id, data: $input) {
+        ID: id
+        name
+        autoScale
+        count
+        minNodes
+        maxNodes
+        # @genqlient(typename: "Node")
+        nodes(where: { nodePoolAssigned: { equals: true } }) {
+            ID: id
+            # @genqlient(typename: "Status")
+            status {
+                status
+                message
+            }
+        }
+        createdAt
+        updatedAt
+    }
+}
+
+# @genqlient(omitempty: true)
+mutation DeleteNodePoolNode(
+    $id: ID!,
+    $nodeId: ID!
+) {
+    # @genqlient(typename: "Node")
+    deleteNodePoolNode(id: $id, nodeId: $nodeId) {
+        ID: id
+        # @genqlient(typename: "Status")
+        status {
+            status
+            message
+        }
+    }
+}

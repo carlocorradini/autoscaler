@@ -1,0 +1,32 @@
+# The filename with the GraphQL schema (in SDL format).
+schema: schema.graphql
+
+# Filename(s) or globs with the operations for which to generate code.
+operations:
+  - genqlient.graphql
+
+# The filename to which to write the generated code.
+generated: generated.go
+
+# The package name for the output code.
+package: gorecluster
+
+# Set to the fully-qualified name of a Go type which generated helpers
+# should accept and use as the context.Context for HTTP requests.
+context_type: context.Context
+
+# A map from GraphQL type name to Go fully-qualified type name to override
+# the Go type genqlient will use for this GraphQL type.
+bindings:
+  BigInt:
+    type: big.Int
+  NonEmptyString:
+    type: string
+  NonNegativeInt:
+    type: uint
+  PositiveInt:
+    type: uint
+  Timestamp:
+    type: int64
+  UUID:
+    type: string
