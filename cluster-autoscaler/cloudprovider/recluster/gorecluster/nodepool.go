@@ -49,12 +49,12 @@ func (c *Client) UpdateNodePool(ctx context.Context, ID string, opts *UpdateNode
 	return &resp.UpdateNodePool, nil
 }
 
-// DeleteNodePoolNode deletes a specific node in a node pool.
-func (c *Client) DeleteNodePoolNode(ctx context.Context, ID string, nodeID string, _ *DeleteNodePoolNodeOpts) (*Node, error) {
-	resp, err := DeleteNodePoolNode(ctx, c.graphQLClient, ID, nodeID)
+// DeleteNodePoolNode deletes a specific node from a node pool.
+func (c *Client) DeleteNodePoolNode(ctx context.Context, _ string, nodeID string, _ *DeleteNodePoolNodeOpts) (*Node, error) {
+	resp, err := UnassignNode(ctx, c.graphQLClient, nodeID)
 	if err != nil {
 		return nil, err
 	}
 
-	return &resp.DeleteNodePoolNode, nil
+	return &resp.UnassignNode, nil
 }

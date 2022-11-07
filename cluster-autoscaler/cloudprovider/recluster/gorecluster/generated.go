@@ -8,15 +8,6 @@ import (
 	"github.com/Khan/genqlient/graphql"
 )
 
-// DeleteNodePoolNodeResponse is returned by DeleteNodePoolNode on success.
-type DeleteNodePoolNodeResponse struct {
-	// Delete Node from Node pool
-	DeleteNodePoolNode Node `json:"deleteNodePoolNode"`
-}
-
-// GetDeleteNodePoolNode returns DeleteNodePoolNodeResponse.DeleteNodePoolNode, and is useful for accessing the field via an interface.
-func (v *DeleteNodePoolNodeResponse) GetDeleteNodePoolNode() Node { return v.DeleteNodePoolNode }
-
 // Node includes the requested fields of the GraphQL type Node.
 // The GraphQL type's documentation follows.
 //
@@ -101,10 +92,14 @@ type NodeStatusEnum string
 const (
 	// Node is active
 	NodeStatusEnumActive NodeStatusEnum = "ACTIVE"
+	// Node is active and delete
+	NodeStatusEnumActiveDelete NodeStatusEnum = "ACTIVE_DELETE"
 	// Node is active but not healthy and is not accepting pods
 	NodeStatusEnumActiveNotReady NodeStatusEnum = "ACTIVE_NOT_READY"
 	// Node is active, healthy and ready to accept pods
 	NodeStatusEnumActiveReady NodeStatusEnum = "ACTIVE_READY"
+	// Node is booting
+	NodeStatusEnumBooting NodeStatusEnum = "BOOTING"
 	// Node is inactive
 	NodeStatusEnumInactive NodeStatusEnum = "INACTIVE"
 	// Unknown
@@ -127,6 +122,15 @@ func (v *Status) GetStatus() NodeStatusEnum { return v.Status }
 
 // GetMessage returns Status.Message, and is useful for accessing the field via an interface.
 func (v *Status) GetMessage() string { return v.Message }
+
+// UnassignNodeResponse is returned by UnassignNode on success.
+type UnassignNodeResponse struct {
+	// Unassign node from node pool
+	UnassignNode Node `json:"unassignNode"`
+}
+
+// GetUnassignNode returns UnassignNodeResponse.UnassignNode, and is useful for accessing the field via an interface.
+func (v *UnassignNodeResponse) GetUnassignNode() Node { return v.UnassignNode }
 
 // Update Node pool input
 type UpdateNodePoolInput struct {
@@ -161,17 +165,13 @@ type UpdateNodePoolResponse struct {
 // GetUpdateNodePool returns UpdateNodePoolResponse.UpdateNodePool, and is useful for accessing the field via an interface.
 func (v *UpdateNodePoolResponse) GetUpdateNodePool() NodePool { return v.UpdateNodePool }
 
-// __DeleteNodePoolNodeInput is used internally by genqlient
-type __DeleteNodePoolNodeInput struct {
-	Id     string `json:"id,omitempty"`
-	NodeId string `json:"nodeId,omitempty"`
+// __UnassignNodeInput is used internally by genqlient
+type __UnassignNodeInput struct {
+	Id string `json:"id,omitempty"`
 }
 
-// GetId returns __DeleteNodePoolNodeInput.Id, and is useful for accessing the field via an interface.
-func (v *__DeleteNodePoolNodeInput) GetId() string { return v.Id }
-
-// GetNodeId returns __DeleteNodePoolNodeInput.NodeId, and is useful for accessing the field via an interface.
-func (v *__DeleteNodePoolNodeInput) GetNodeId() string { return v.NodeId }
+// GetId returns __UnassignNodeInput.Id, and is useful for accessing the field via an interface.
+func (v *__UnassignNodeInput) GetId() string { return v.Id }
 
 // __UpdateNodePoolInput is used internally by genqlient
 type __UpdateNodePoolInput struct {
@@ -184,44 +184,6 @@ func (v *__UpdateNodePoolInput) GetId() string { return v.Id }
 
 // GetInput returns __UpdateNodePoolInput.Input, and is useful for accessing the field via an interface.
 func (v *__UpdateNodePoolInput) GetInput() UpdateNodePoolInput { return v.Input }
-
-func DeleteNodePoolNode(
-	ctx context.Context,
-	client graphql.Client,
-	id string,
-	nodeId string,
-) (*DeleteNodePoolNodeResponse, error) {
-	req := &graphql.Request{
-		OpName: "DeleteNodePoolNode",
-		Query: `
-mutation DeleteNodePoolNode ($id: ID!, $nodeId: ID!) {
-	deleteNodePoolNode(id: $id, nodeId: $nodeId) {
-		ID: id
-		status {
-			status
-			message
-		}
-	}
-}
-`,
-		Variables: &__DeleteNodePoolNodeInput{
-			Id:     id,
-			NodeId: nodeId,
-		},
-	}
-	var err error
-
-	var data DeleteNodePoolNodeResponse
-	resp := &graphql.Response{Data: &data}
-
-	err = client.MakeRequest(
-		ctx,
-		req,
-		resp,
-	)
-
-	return &data, err
-}
 
 func NodePools(
 	ctx context.Context,
@@ -254,6 +216,42 @@ query NodePools {
 	var err error
 
 	var data NodePoolsResponse
+	resp := &graphql.Response{Data: &data}
+
+	err = client.MakeRequest(
+		ctx,
+		req,
+		resp,
+	)
+
+	return &data, err
+}
+
+func UnassignNode(
+	ctx context.Context,
+	client graphql.Client,
+	id string,
+) (*UnassignNodeResponse, error) {
+	req := &graphql.Request{
+		OpName: "UnassignNode",
+		Query: `
+mutation UnassignNode ($id: ID!) {
+	unassignNode(id: $id) {
+		ID: id
+		status {
+			status
+			message
+		}
+	}
+}
+`,
+		Variables: &__UnassignNodeInput{
+			Id: id,
+		},
+	}
+	var err error
+
+	var data UnassignNodeResponse
 	resp := &graphql.Response{Data: &data}
 
 	err = client.MakeRequest(

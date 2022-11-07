@@ -33,7 +33,7 @@ type Client interface {
 	// UpdateNodePool updates a specific node pool.
 	UpdateNodePool(ctx context.Context, ID string, opts *gorecluster.UpdateNodePoolOpts) (*gorecluster.NodePool, error)
 
-	// DeleteNodePoolNode deletes a specific node in a node pool.
+	// DeleteNodePoolNode deletes a specific node from a node pool.
 	DeleteNodePoolNode(ctx context.Context, ID string, nodeID string, opts *gorecluster.DeleteNodePoolNodeOpts) (*gorecluster.Node, error)
 }
 

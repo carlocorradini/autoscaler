@@ -124,9 +124,13 @@ type Cpu {
 """Cpu architectures"""
 enum CpuArchitectureEnum {
   """
-  64-bit version of the x86 instruction set. Also known as x64, x86-64, AMD64, and Intel 64
+  64-bit version of the x86 instruction set. Also known as x64, x86-64, x86_64, AMD64, and Intel 64
   """
-  x86_64
+  AMD64
+  """
+  64-bit extension of the ARM architecture family. Also known as AArch64 and ARM64
+  """
+  ARM64
 }
 
 """Cpu architecture filter"""
@@ -400,13 +404,6 @@ type Mutation {
     """User data"""
     data: CreateUserInput!
   ): User!
-  """Delete Node from Node pool"""
-  deleteNodePoolNode(
-    """Node pool identifier"""
-    id: ID!
-    """Node identifier"""
-    nodeId: ID!
-  ): Node!
   """Sign in user"""
   signIn(
     """User password"""
@@ -414,6 +411,11 @@ type Mutation {
     """User username"""
     username: NonEmptyString!
   ): JWT!
+  """Unassign node from node pool"""
+  unassignNode(
+    """Node identifier"""
+    id: ID!
+  ): Node!
   """Update Node pool"""
   updateNodePool(
     """Node pool data"""
@@ -612,12 +614,12 @@ type NodePool {
 
 """Node roles"""
 enum NodeRoleEnum {
-  """K8s master"""
-  K8S_MASTER
+  """K8s controller"""
+  K8S_CONTROLLER
   """K8s worker"""
   K8S_WORKER
-  """reCluster master"""
-  RECLUSTER_MASTER
+  """reCluster controller"""
+  RECLUSTER_CONTROLLER
 }
 
 """Node roles filter"""
@@ -638,10 +640,14 @@ input NodeRoleEnumListFilter {
 enum NodeStatusEnum {
   """Node is active"""
   ACTIVE
+  """Node is active and delete"""
+  ACTIVE_DELETE
   """Node is active but not healthy and is not accepting pods"""
   ACTIVE_NOT_READY
   """Node is active, healthy and ready to accept pods"""
   ACTIVE_READY
+  """Node is booting"""
+  BOOTING
   """Node is inactive"""
   INACTIVE
   """Unknown"""

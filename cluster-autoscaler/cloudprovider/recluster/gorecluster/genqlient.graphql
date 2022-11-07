@@ -50,12 +50,11 @@ mutation UpdateNodePool(
 }
 
 # @genqlient(omitempty: true)
-mutation DeleteNodePoolNode(
-    $id: ID!,
-    $nodeId: ID!
+mutation UnassignNode(
+    $id: ID!
 ) {
     # @genqlient(typename: "Node")
-    deleteNodePoolNode(id: $id, nodeId: $nodeId) {
+    unassignNode(id: $id) {
         ID: id
         # @genqlient(typename: "Status")
         status {
