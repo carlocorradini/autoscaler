@@ -1,6 +1,9 @@
 # Kubernetes Autoscaler
 
-[![Release Charts](https://github.com/kubernetes/autoscaler/actions/workflows/release.yaml/badge.svg)](https://github.com/kubernetes/autoscaler/actions/workflows/release.yaml) [![Tests](https://github.com/kubernetes/autoscaler/actions/workflows/ci.yaml/badge.svg)](https://github.com/kubernetes/autoscaler/actions/workflows/ci.yaml) [![GoDoc Widget]][GoDoc]
+[![release](https://github.com/carlocorradini/autoscaler/actions/workflows/release.yaml/badge.svg)](https://github.com/carlocorradini/autoscaler/actions/workflows/release.yaml)
+[![Release Charts](https://github.com/kubernetes/autoscaler/actions/workflows/release.yaml/badge.svg)](https://github.com/kubernetes/autoscaler/actions/workflows/release.yaml)
+[![Tests](https://github.com/kubernetes/autoscaler/actions/workflows/ci.yaml/badge.svg)](https://github.com/kubernetes/autoscaler/actions/workflows/ci.yaml)
+[![GoDoc Widget]][GoDoc]
 
 This repository contains autoscaling-related components for Kubernetes.
 
