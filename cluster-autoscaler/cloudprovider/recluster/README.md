@@ -30,9 +30,8 @@ go run github.com/Khan/genqlient
 > **Warning**: Make sure you are inside [`cluster-autoscaler`](../../../cluster-autoscaler) directory
 
 ```console
-make build
+make
 ```
-tag the generated docker image and push it to a registry.
 
 ### Docker image
 
@@ -41,3 +40,5 @@ tag the generated docker image and push it to a registry.
 ```console
 make container
 ```
+
+Tag the generated docker image and push it to a registry.

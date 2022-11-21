@@ -1,34 +1,38 @@
-permissions:
-  contents: read
+name: release
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   release:
-    permissions:
-      contents: write  # for helm/chart-releaser-action to push chart release and create a release
     runs-on: ubuntu-latest
     steps:
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: 1.19
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
-
-      - name: Configure Git
+          path: ${{ env.GOPATH }}/src/k8s.io/autoscaler
+      - name: Generate
+        working-directory: ${{ env.GOPATH }}/src/k8s.io/autoscaler/cluster-autoscaler/cloudprovider/recluster/gorecluster
         run: |
-          git config user.name "${GITHUB_ACTOR}"
-          git config user.email "${GITHUB_ACTOR}@users.noreply.github.com"
-
-      - name: Install Helm
-        uses: azure/setup-helm@v1
+          go run github.com/Khan/genqlient
+      - name: Build
+        working-directory: ${{ env.GOPATH }}/src/k8s.io/autoscaler/cluster-autoscaler
+        run: |
+          make
+      - name: Release
+        uses: softprops/action-gh-release@v1
         with:
-          version: v3.4.0
-
-      - env:
-          CR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CR_RELEASE_NAME_TEMPLATE: "cluster-autoscaler-chart-{{ .Version }}"
-        name: Run chart-releaser
-        uses: helm/chart-releaser-action@v1.1.0
-name: Release Charts
-on:
-  push:
-    branches:
-      - master
+          files: |
+            ${{ env.GOPATH }}/src/k8s.io/autoscaler/cluster-autoscaler/cluster-autoscaler-amd64
+            ${{ env.GOPATH }}/src/k8s.io/autoscaler/cluster-autoscaler/cluster-autoscaler-arm64
+          body: Cluster Autoscaler for reCluster
