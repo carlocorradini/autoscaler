@@ -19,7 +19,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0
           path: ${{ env.GOPATH }}/src/k8s.io/autoscaler
       - name: Generate
         working-directory: ${{ env.GOPATH }}/src/k8s.io/autoscaler/cluster-autoscaler/cloudprovider/recluster/gorecluster
