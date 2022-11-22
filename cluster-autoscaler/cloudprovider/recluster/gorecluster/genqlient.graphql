@@ -1,3 +1,6 @@
+# NodePools returns all available node pools.
+# The list of nodes is also returned for each node pool.
+#
 # @genqlient(omitempty: true)
 query NodePools {
     # @genqlient(typename: "NodePool")
@@ -22,6 +25,9 @@ query NodePools {
     }
 }
 
+# UpdateNodePool update the node pool.
+# It returns the updated node pool if it is successful.
+#
 # @genqlient(omitempty: true)
 mutation UpdateNodePool(
     $id: ID!,
@@ -49,6 +55,9 @@ mutation UpdateNodePool(
     }
 }
 
+# UnassignNode unassign the node from its node pool.
+# It returns the unassigned node if it is successful.
+#
 # @genqlient(omitempty: true)
 mutation UnassignNode(
     $id: ID!

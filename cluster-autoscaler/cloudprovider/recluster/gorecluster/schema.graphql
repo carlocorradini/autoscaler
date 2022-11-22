@@ -201,14 +201,6 @@ input CreateCpuInput {
   vulnerabilities: [NonEmptyString!]
 }
 
-"""Create Disk input"""
-input CreateDiskInput {
-  """Disk name"""
-  name: NonEmptyString!
-  """Disk size"""
-  size: BigInt!
-}
-
 """Create Interface input"""
 input CreateInterfaceInput {
   """Interface MAC address"""
@@ -225,24 +217,32 @@ input CreateInterfaceInput {
 input CreateNodeInput {
   """Node Cpu"""
   cpu: CreateCpuInput!
-  """Node disks"""
-  disks: [CreateDiskInput!]!
   """Node interfaces"""
   interfaces: [CreateInterfaceInput!]!
   """Maximum efficiency power consumption"""
   maxEfficiencyPowerConsumption: PositiveInt
   """Maximum power consumption"""
   maxPowerConsumption: PositiveInt!
+  """Node memory"""
+  memory: BigInt!
   """Minimum performance power consumption"""
   minPerformancePowerConsumption: PositiveInt
   """Minimum power consumption"""
   minPowerConsumption: PositiveInt!
   """Node permissions"""
   permissions: [NodePermissionEnum!]
-  """Node ram"""
-  ram: BigInt!
   """Node roles"""
   roles: [NodeRoleEnum!]!
+  """Node storages"""
+  storages: [CreateStorageInput!]!
+}
+
+"""Create Storage input"""
+input CreateStorageInput {
+  """Storage name"""
+  name: NonEmptyString!
+  """Storage size"""
+  size: BigInt!
 }
 
 """Create User input"""
@@ -301,24 +301,10 @@ enum DigitalUnitEnum {
   b
 }
 
-"""Disk"""
-type Disk {
-  """Creation timestamp"""
-  createdAt: Timestamp!
-  """Disk identifier"""
-  id: ID!
-  """Disk name"""
-  name: String!
-  """Disk node"""
-  node: Node!
-  """Disk size"""
-  size(
-    """Digital conversion unit"""
-    unit: DigitalUnitEnum! = B
-  ): BigInt!
-  """Update timestamp"""
-  updatedAt: Timestamp!
-}
+"""
+A field whose value is either an IPv4 or IPv6 address: https://en.wikipedia.org/wiki/IP_address.
+"""
+scalar IP
 
 """Integer filter"""
 input IntFilter {
@@ -501,23 +487,12 @@ input NestedUuidFilter {
 
 """Node"""
 type Node {
+  """Node IP address"""
+  address: IP!
   """Node CPU"""
   cpu: Cpu!
   """Creation timestamp"""
   createdAt: Timestamp!
-  """Node disks"""
-  disks(
-    """Data cursor"""
-    cursor: ID
-    """Order options"""
-    orderBy: OrderByDiskInput
-    """Skip data"""
-    skip: NonNegativeInt! = 0
-    """Take data"""
-    take: Int! = 8
-    """Filter options"""
-    where: WhereDiskInput
-  ): [Disk!]!
   """Node identifier"""
   id: ID!
   """Node interfaces"""
@@ -537,25 +512,40 @@ type Node {
   maxEfficiencyPowerConsumption: Int
   """Maximum power consumption"""
   maxPowerConsumption: Int!
+  """Node memory"""
+  memory(
+    """Digital conversion unit"""
+    unit: DigitalUnitEnum! = B
+  ): BigInt!
   """Minimum performance power consumption"""
   minPerformancePowerConsumption: Int
   """Minimum power consumption"""
   minPowerConsumption: Int!
+  """Node name"""
+  name: String!
   """Node Node pool"""
-  nodePool: NodePool
+  nodePool: NodePool!
   """Node assigned to Node pool"""
   nodePoolAssigned: Boolean!
   """Node permissions"""
   permissions: [NodePermissionEnum!]!
-  """Node ram"""
-  ram(
-    """Digital conversion unit"""
-    unit: DigitalUnitEnum! = B
-  ): BigInt!
   """Node roles"""
   roles: [NodeRoleEnum!]!
   """Node status"""
   status: Status!
+  """Node storages"""
+  storages(
+    """Data cursor"""
+    cursor: ID
+    """Order options"""
+    orderBy: OrderByStorageInput
+    """Skip data"""
+    skip: NonNegativeInt! = 0
+    """Take data"""
+    take: Int! = 8
+    """Filter options"""
+    where: WhereStorageInput
+  ): [Storage!]!
   """Update timestamp"""
   updatedAt: Timestamp!
 }
@@ -608,7 +598,7 @@ type NodePool {
     """Filter options"""
     where: WhereNodeInput
   ): [Node!]!
-  """Update timestamp"""
+  """Up date timestamp"""
   updatedAt: Timestamp!
 }
 
@@ -640,8 +630,8 @@ input NodeRoleEnumListFilter {
 enum NodeStatusEnum {
   """Node is active"""
   ACTIVE
-  """Node is active and delete"""
-  ACTIVE_DELETE
+  """Node is active and is deleting from K8s"""
+  ACTIVE_DELETING
   """Node is active but not healthy and is not accepting pods"""
   ACTIVE_NOT_READY
   """Node is active, healthy and ready to accept pods"""
@@ -714,22 +704,6 @@ input OrderByCpuInput {
   vulnerabilities: SortOrderEnum
 }
 
-"""Disk order by input"""
-input OrderByDiskInput {
-  """Creation timestamp"""
-  createdAt: SortOrderEnum
-  """Disk identifier"""
-  id: SortOrderEnum!
-  """Disk name"""
-  name: SortOrderEnum!
-  """Node identifier"""
-  nodeId: SortOrderEnum!
-  """Disk size"""
-  size: SortOrderEnum!
-  """Update timestamp"""
-  updatedAt: SortOrderEnum
-}
-
 """Interface order by input"""
 input OrderByInterfaceInput {
   """Interface MAC address"""
@@ -752,6 +726,8 @@ input OrderByInterfaceInput {
 
 """Node order by input"""
 input OrderByNodeInput {
+  """Node IP address"""
+  address: SortOrderEnum
   """Cpu identifier"""
   cpuId: SortOrderEnum
   """Creation timestamp"""
@@ -762,18 +738,20 @@ input OrderByNodeInput {
   maxEfficiencyPowerConsumption: SortOrderEnum
   """Maximum power consumption"""
   maxPowerConsumption: SortOrderEnum
+  """Node memory"""
+  memory: SortOrderEnum
   """Minimum performance power consumption"""
   minPerformancePowerConsumption: SortOrderEnum
   """Minimum power consumption"""
   minPowerConsumption: SortOrderEnum
+  """Node name"""
+  name: SortOrderEnum
   """Node assigned to Node pool"""
   nodePoolAssigned: SortOrderEnum
   """Node pool identifier"""
   nodePoolId: SortOrderEnum
   """Node permissions"""
   permissions: SortOrderEnum
-  """Node ram"""
-  ram: SortOrderEnum
   """Node roles"""
   roles: SortOrderEnum
   """Update timestamp"""
@@ -810,6 +788,22 @@ input OrderByStatusInput {
   reason: SortOrderEnum
   """Status"""
   status: SortOrderEnum
+  """Update timestamp"""
+  updatedAt: SortOrderEnum
+}
+
+"""Storage order by input"""
+input OrderByStorageInput {
+  """Creation timestamp"""
+  createdAt: SortOrderEnum
+  """Storage identifier"""
+  id: SortOrderEnum!
+  """Storage name"""
+  name: SortOrderEnum!
+  """Node identifier"""
+  nodeId: SortOrderEnum!
+  """Storage size"""
+  size: SortOrderEnum!
   """Update timestamp"""
   updatedAt: SortOrderEnum
 }
@@ -852,28 +846,12 @@ type Query {
     """Filter options"""
     where: WhereCpuInput
   ): [Cpu!]!
-  """Disk matching the identifier"""
-  disk(
-    """Disk identifier"""
-    id: ID!
-  ): Disk
-  """List of Disks"""
-  disks(
-    """Data cursor"""
-    cursor: ID
-    """Order options"""
-    orderBy: OrderByDiskInput
-    """Skip data"""
-    skip: NonNegativeInt! = 0
-    """Take data"""
-    take: Int! = 8
-    """Filter options"""
-    where: WhereDiskInput
-  ): [Disk!]!
   """Interface matching the identifier"""
   interface(
+    """Interface MAC address"""
+    address: MAC
     """Interface identifier"""
-    id: ID!
+    id: ID
   ): Interface
   """List of Interfaces"""
   interfaces(
@@ -890,13 +868,19 @@ type Query {
   ): [Interface!]!
   """Node matching the identifier"""
   node(
+    """Node IP address"""
+    address: IP
     """Node identifier"""
-    id: ID!
+    id: ID
+    """Node name"""
+    name: String
   ): Node
   """Node pool matching the identifier"""
   nodePool(
     """Node pool identifier"""
-    id: ID!
+    id: ID
+    """Node pool name"""
+    name: String
   ): NodePool
   """List of Node pools"""
   nodePools(
@@ -942,6 +926,24 @@ type Query {
     """Filter options"""
     where: WhereStatusInput
   ): [Status!]!
+  """Storage matching the identifier"""
+  storage(
+    """Storage identifier"""
+    id: ID!
+  ): Storage
+  """List of Storages"""
+  storages(
+    """Data cursor"""
+    cursor: ID
+    """Order options"""
+    orderBy: OrderByStorageInput
+    """Skip data"""
+    skip: NonNegativeInt! = 0
+    """Take data"""
+    take: Int! = 8
+    """Filter options"""
+    where: WhereStorageInput
+  ): [Storage!]!
   """User matching the identifier"""
   user(
     """User identifier"""
@@ -988,7 +990,26 @@ type Status {
   reason: String
   """Status"""
   status: NodeStatusEnum!
-  """Update timestamp"""
+  """Up date timestamp"""
+  updatedAt: Timestamp!
+}
+
+"""Storage"""
+type Storage {
+  """Creation timestamp"""
+  createdAt: Timestamp!
+  """Storage identifier"""
+  id: ID!
+  """Storage name"""
+  name: String!
+  """Storage node"""
+  node: Node!
+  """Storage size"""
+  size(
+    """Digital conversion unit"""
+    unit: DigitalUnitEnum! = B
+  ): BigInt!
+  """Up date timestamp"""
   updatedAt: Timestamp!
 }
 
@@ -1245,22 +1266,6 @@ input WhereCpuInput {
   vulnerabilities: StringListFilter
 }
 
-"""Disk where input"""
-input WhereDiskInput {
-  """Creation timestamp"""
-  createdAt: TimestampFilter
-  """Disk identifier"""
-  id: UuidFilter
-  """Disk name"""
-  name: StringFilter
-  """Node identifier"""
-  nodeId: StringFilter
-  """Disk size"""
-  size: BigIntFilter
-  """Update timestamp"""
-  updatedAt: TimestampFilter
-}
-
 """Interface where input"""
 input WhereInterfaceInput {
   """Interface MAC address"""
@@ -1283,6 +1288,8 @@ input WhereInterfaceInput {
 
 """Node where input"""
 input WhereNodeInput {
+  """Node IP address"""
+  address: StringFilter
   """Cpu identifier"""
   cpuId: UuidFilter
   """Creation timestamp"""
@@ -1293,18 +1300,20 @@ input WhereNodeInput {
   maxEfficiencyPowerConsumption: IntNullableFilter
   """Maximum power consumption"""
   maxPowerConsumption: IntFilter
+  """Node memory"""
+  memory: BigIntFilter
   """Minimum performance power consumption"""
   minPerformancePowerConsumption: IntNullableFilter
   """Minimum power consumption"""
   minPowerConsumption: IntFilter
+  """Node name"""
+  name: StringFilter
   """Node assigned to Node pool"""
   nodePoolAssigned: BoolFilter
   """Node pool identifier"""
   nodePoolId: UuidFilter
   """Node permissions"""
   permissions: NodePermissionEnumListFilter
-  """Node ram"""
-  ram: BigIntFilter
   """Node roles"""
   roles: NodeRoleEnumListFilter
   """Update timestamp"""
@@ -1345,6 +1354,22 @@ input WhereStatusInput {
   updatedAt: TimestampFilter
 }
 
+"""Storage where input"""
+input WhereStorageInput {
+  """Creation timestamp"""
+  createdAt: TimestampFilter
+  """Storage identifier"""
+  id: UuidFilter
+  """Storage name"""
+  name: StringFilter
+  """Node identifier"""
+  nodeId: StringFilter
+  """Storage size"""
+  size: BigIntFilter
+  """Update timestamp"""
+  updatedAt: TimestampFilter
+}
+
 """User where input"""
 input WhereUserInput {
   """Creation timestamp"""
@@ -1367,8 +1392,6 @@ enum WoLFlagEnum {
   a
   """Wake on broadcast messages"""
   b
-  """Disable"""
-  d
   """Wake on MagicPacket"""
   g
   """Wake on multicast messages"""
