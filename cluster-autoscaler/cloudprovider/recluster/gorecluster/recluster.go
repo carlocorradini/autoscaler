@@ -24,9 +24,9 @@ import (
 )
 
 const (
-	// GraphQL client timeout in seconds.
+	// GraphQLClientTimeout represents GraphQL client timeout in seconds.
 	GraphQLClientTimeout = 60 * time.Second
-	// GraphQL client user agent.
+	// GraphQLClientUserAgent represents GraphQL client user agent.
 	GraphQLClientUserAgent = "kubernetes/cluster-autoscaler"
 )
 
