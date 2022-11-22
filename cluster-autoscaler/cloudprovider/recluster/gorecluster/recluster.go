@@ -24,7 +24,9 @@ import (
 )
 
 const (
-	GraphQLClientTimeout   = 60 * time.Second
+	// GraphQL client timeout in seconds.
+	GraphQLClientTimeout = 60 * time.Second
+	// GraphQL client user agent.
 	GraphQLClientUserAgent = "kubernetes/cluster-autoscaler"
 )
 
@@ -36,6 +38,7 @@ type Client struct {
 	token string
 }
 
+// ReclusterTransport transport.
 type ReclusterTransport struct {
 	T http.RoundTripper
 }
@@ -58,6 +61,7 @@ func NewClient(URL string, token string) (*Client, error) {
 	return &client, nil
 }
 
+// NewReclusterTransport generate new reCluster transport.
 func NewReclusterTransport(T http.RoundTripper) *ReclusterTransport {
 	if T == nil {
 		T = http.DefaultTransport
@@ -65,6 +69,8 @@ func NewReclusterTransport(T http.RoundTripper) *ReclusterTransport {
 	return &ReclusterTransport{T}
 }
 
+// RoundTrip executes a single HTTP transaction, returning
+// a Response for the provided Request.
 func (adt *ReclusterTransport) RoundTrip(req *http.Request) (*http.Response, error) {
 	req.Header.Add("User-Agent", GraphQLClientUserAgent)
 	return adt.T.RoundTrip(req)
