@@ -21,24 +21,52 @@ The autoscaler will pick up any changes and adjust accordingly.
 
 > **Warning**: Make sure you are inside [`gorecluster`](./gorecluster) directory
 
-```console
+```sh
 go run github.com/Khan/genqlient
 ```
 
-### Build
+### Build binaries
 
 > **Warning**: Make sure you are inside [`cluster-autoscaler`](../../../cluster-autoscaler) directory
 
-```console
-make
+#### amd64
+
+```sh
+make build-arch-amd64
 ```
 
-### Docker image
+#### arm64
+
+```sh
+make build-arch-arm64
+```
+
+### Docker images
 
 > **Warning**: Make sure you are inside [`cluster-autoscaler`](../../../cluster-autoscaler) directory
 
-```console
-make container
+> **Warning**: Enable Docker BuildKit:
+> - For all future commands in the current shell: `export DOCKER_BUILDKIT=1`
+> - Just for one command: `DOCKER_BUILDKIT=1 docker build ...`
+
+#### adm64
+
+```sh
+docker buildx build \
+  --platform linux/amd64 \
+  -f Dockerfile.amd64 \
+  --tag recluster/cluster-autoscaler:latest \
+  --output "type=docker,dest=cluster-autoscaler.amd64.tar.gz" \
+  .
 ```
 
-Tag the generated docker image and push it to a registry.
+#### arm64
+
+```sh
+docker buildx build \
+  --platform linux/arm64 \
+  -f Dockerfile.arm64 \
+  --tag recluster/cluster-autoscaler:latest \
+  --output "type=docker,dest=cluster-autoscaler.arm64.tar.gz" \
+  .
+```
