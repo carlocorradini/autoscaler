@@ -66,4 +66,4 @@ jobs:
         with:
           files: |
             ${{ env.GOPATH }}/src/k8s.io/autoscaler/cluster-autoscaler/cluster-autoscaler.amd64.tar.gz
-            ${{ env.GOPATH }}/src/k8s.io/autoscaler/cluster-autoscaler/cluster-autoscaler-arm64.tar.gz
+            ${{ env.GOPATH }}/src/k8s.io/autoscaler/cluster-autoscaler/cluster-autoscaler.arm64.tar.gz
