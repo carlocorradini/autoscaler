@@ -35,14 +35,10 @@ jobs:
         working-directory: ${{ env.GOPATH }}/src/k8s.io/autoscaler/cluster-autoscaler/cloudprovider/recluster/gorecluster
         run: |
           go run github.com/Khan/genqlient
-      - name: Build amd64 binary
+      - name: Build binaries
         working-directory: ${{ env.GOPATH }}/src/k8s.io/autoscaler/cluster-autoscaler
         run: |
-          make build-arch-amd64
-      - name: Build arm64 binary
-        working-directory: ${{ env.GOPATH }}/src/k8s.io/autoscaler/cluster-autoscaler
-        run: |
-          make build-arch-arm64
+          make all
       - name: Build Docker amd64 image
         working-directory: ${{ env.GOPATH }}/src/k8s.io/autoscaler/cluster-autoscaler
         run: |

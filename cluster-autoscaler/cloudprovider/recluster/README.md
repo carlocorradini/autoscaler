@@ -29,16 +29,10 @@ go run github.com/Khan/genqlient
 
 > **Warning**: Make sure you are inside [`cluster-autoscaler`](../../../cluster-autoscaler) directory
 
-#### amd64
+> **Note**: `amd64` and `arm64` binaries are supported
 
 ```sh
-make build-arch-amd64
-```
-
-#### arm64
-
-```sh
-make build-arch-arm64
+make all
 ```
 
 ### Docker images
