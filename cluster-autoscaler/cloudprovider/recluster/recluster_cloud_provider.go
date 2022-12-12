@@ -99,10 +99,10 @@ func (r *reclusterCloudProvider) NodeGroupForNode(node *apiv1.Node) (cloudprovid
 		}
 
 		for _, node := range nodes {
-			klog.V(6).Infof("Checking node %q for ID %q", node.Id, nodeID)
+			klog.V(4).Infof("Checking node %q for ID %q", node.Id, nodeID)
 
 			if node.Id == nodeID {
-				klog.V(6).Infof("Node ID %q assigned to node group %q", node.Id, nodeGroup.Id())
+				klog.V(4).Infof("Node ID %q assigned to node group %q", node.Id, nodeGroup.Id())
 				return nodeGroup, nil
 			}
 		}
