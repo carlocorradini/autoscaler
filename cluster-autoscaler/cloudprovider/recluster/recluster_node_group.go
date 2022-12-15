@@ -114,14 +114,14 @@ func (ng *NodeGroup) DeleteNodes(nodes []*apiv1.Node) error {
 		if err != nil {
 			// CA creates fake node objects to represent upcoming Nodes that haven't registered as nodes yet.
 			// We cannot delete the node at this point.
-			return fmt.Errorf("cannot delete node %q with provider ID %q on NodeGroup %q: %s", node.Name, node.Spec.ProviderID, ng.id, err)
+			return fmt.Errorf("cannot delete node %s with provider ID %s on NodeGroup %s: %w", node.Name, node.Spec.ProviderID, ng.id, err)
 		}
 
-		klog.V(4).Infof("Deleting node %q", nodeID)
+		klog.V(4).Infof("Deleting node %s", nodeID)
 
 		_, err = ng.client.DeleteNodePoolNode(ctx, ng.id, nodeID, nil)
 		if err != nil {
-			return fmt.Errorf("failed to delete node %q from node pool %q: %s",
+			return fmt.Errorf("failed to delete node %s from node pool %s: %w",
 				nodeID, ng.id, err)
 		}
 
@@ -249,7 +249,7 @@ func toInstanceStatus(status *gorecluster.Status) *cloudprovider.InstanceStatus 
 	switch status.Status {
 	case "BOOTING", "ACTIVE":
 		instanceStatus.State = cloudprovider.InstanceCreating
-	case "ACTIVE_READY":
+	case "ACTIVE_READY", "ACTIVE_NOT_READY":
 		instanceStatus.State = cloudprovider.InstanceRunning
 	case "ACTIVE_DELETING":
 		instanceStatus.State = cloudprovider.InstanceDeleting

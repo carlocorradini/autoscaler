@@ -46,7 +46,7 @@ func BuildRecluster(opts config.AutoscalingOptions, _ cloudprovider.NodeGroupDis
 
 		configFile, err = os.Open(opts.CloudConfig)
 		if err != nil {
-			klog.Fatalf("Could not open cloud provider configuration file %s: %v", opts.CloudConfig, err)
+			klog.Fatalf("Could not open cloud provider configuration file %s: %w", opts.CloudConfig, err)
 		}
 
 		defer configFile.Close()
@@ -54,7 +54,7 @@ func BuildRecluster(opts config.AutoscalingOptions, _ cloudprovider.NodeGroupDis
 
 	manager, err := NewManager(configFile)
 	if err != nil {
-		klog.Fatalf("Failed to create reCluster manager: %v", err)
+		klog.Fatalf("Failed to create reCluster manager: %w", err)
 	}
 
 	provider := &reclusterCloudProvider{
@@ -88,10 +88,10 @@ func (r *reclusterCloudProvider) NodeGroupForNode(node *apiv1.Node) (cloudprovid
 		return nil, err
 	}
 
-	klog.V(4).Infof("Searching node group for node %q", nodeID)
+	klog.V(4).Infof("Searching node group for node %s", nodeID)
 
 	for _, nodeGroup := range r.manager.nodeGroups {
-		klog.V(4).Infof("Iterating node group %q", nodeGroup.Id())
+		klog.V(4).Infof("Iterating node group %s", nodeGroup.Id())
 
 		nodes, err := nodeGroup.Nodes()
 		if err != nil {
@@ -99,16 +99,16 @@ func (r *reclusterCloudProvider) NodeGroupForNode(node *apiv1.Node) (cloudprovid
 		}
 
 		for _, node := range nodes {
-			klog.V(4).Infof("Checking node %q for ID %q", node.Id, nodeID)
+			klog.V(5).Infof("Checking node %s for ID %s", node.Id, nodeID)
 
 			if node.Id == nodeID {
-				klog.V(4).Infof("Node ID %q assigned to node group %q", node.Id, nodeGroup.Id())
+				klog.V(5).Infof("Node %s assigned to node group %s", node.Id, nodeGroup.Id())
 				return nodeGroup, nil
 			}
 		}
 	}
 
-	klog.Warningf("Unable to find node group for node %q", nodeID)
+	klog.Warningf("Unable to find node group for node %s", nodeID)
 
 	return nil, nil
 }
@@ -168,7 +168,7 @@ func toNodeID(node *apiv1.Node) (string, error) {
 			return node.Spec.ProviderID, nil
 		}
 
-		return "", fmt.Errorf("node ID label %q is missing from node %q with provider ID %q", nodeIDLabel, node.Name, node.Spec.ProviderID)
+		return "", fmt.Errorf("node ID label %s is missing from node %s with provider ID %s", nodeIDLabel, node.Name, node.Spec.ProviderID)
 	}
 
 	return nodeID, nil

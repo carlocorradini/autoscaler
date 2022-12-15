@@ -71,10 +71,10 @@ func NewManager(configReader io.Reader) (*Manager, error) {
 
 	// Validate configuration
 	if config.Token == "" {
-		return nil, fmt.Errorf("'token' is not provided")
+		return nil, fmt.Errorf("configuration 'token' is not provided")
 	}
 	if config.URL == "" {
-		return nil, fmt.Errorf("'URL' is not provided")
+		return nil, fmt.Errorf("configuration 'URL' is not provided")
 	}
 
 	// Create API client
@@ -120,7 +120,7 @@ func (m *Manager) Refresh() error {
 	}
 
 	if len(nodeGroups) == 0 {
-		klog.V(4).Info("Cluster-autoscaler is disabled, no node pools are configured")
+		klog.V(4).Info("Cluster-Autoscaler is disabled, no node pools are configured")
 	}
 
 	m.nodeGroups = nodeGroups
