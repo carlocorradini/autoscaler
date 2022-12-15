@@ -385,12 +385,12 @@ type Mutation {
     """Node data"""
     data: CreateNodeInput!
   ): JWT!
-  """Create a new user"""
+  """Create a new User"""
   createUser(
     """User data"""
     data: CreateUserInput!
   ): User!
-  """Sign in user"""
+  """Sign in User"""
   signIn(
     """User password"""
     password: NonEmptyString!
@@ -410,7 +410,15 @@ type Mutation {
     id: ID!
   ): NodePool!
   """Update Status"""
-  updateStatus: Status!
+  updateStatus(
+    """Status data"""
+    data: UpdateStatusInput!
+  ): Status!
+  """Update User"""
+  updateUser(
+    """User data"""
+    data: UpdateUserInput!
+  ): User!
 }
 
 """Nested string filter"""
@@ -1138,11 +1146,29 @@ input UpdateNodePoolInput {
   """Node pool auto scale flag"""
   autoScale: Boolean
   """Node pool node count"""
-  count: PositiveInt
+  count: NonNegativeInt
   """Node pool minimum number of nodes"""
-  minNodes: PositiveInt
+  minNodes: NonNegativeInt
   """Node pool name"""
   name: NonEmptyString
+}
+
+"""Update Status input"""
+input UpdateStatusInput {
+  """Status"""
+  status: NodeStatusEnum!
+}
+
+"""Update User input"""
+input UpdateUserInput {
+  """User identifier"""
+  id: ID
+  """User password"""
+  password: NonEmptyString
+  """User permissions"""
+  permissions: [UserPermissionEnum!]
+  """User roles"""
+  roles: [UserRoleEnum!]
 }
 
 """User"""
