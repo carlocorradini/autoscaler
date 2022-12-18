@@ -69,7 +69,7 @@ func NewClient(URL string, token string) (*Client, error) {
 // a Response for the provided Request.
 func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
 	req.Header.Add("User-Agent", GraphQLClientUserAgent)
-	req.Header.Add("Authorization", "Bearer"+t.Token)
+	req.Header.Add("Authorization", "Bearer "+t.Token)
 
 	return t.RoundTripper.RoundTrip(req)
 }
