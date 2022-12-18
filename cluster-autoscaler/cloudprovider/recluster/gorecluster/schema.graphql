@@ -11,7 +11,7 @@ directive @auth(
   roles: [String!]! = []
   """Applicant type."""
   type: String!
-) on FIELD | FIELD_DEFINITION | OBJECT
+) on FIELD | FIELD_DEFINITION | INPUT_FIELD_DEFINITION | OBJECT
 
 """
 The `BigInt` scalar type represents non-fractional signed whole numeric values.
@@ -401,24 +401,24 @@ type Mutation {
   unassignNode(
     """Node identifier"""
     id: ID!
-  ): Node!
+  ): Node! @auth(type: "USER", roles: ["ADMIN"])
   """Update Node pool"""
   updateNodePool(
     """Node pool data"""
     data: UpdateNodePoolInput!
     """Node pool identifier"""
     id: ID!
-  ): NodePool!
+  ): NodePool! @auth(type: "USER", roles: ["ADMIN"])
   """Update Status"""
   updateStatus(
     """Status data"""
     data: UpdateStatusInput!
-  ): Status!
+  ): Status! @auth(type: "NODE")
   """Update User"""
   updateUser(
     """User data"""
     data: UpdateUserInput!
-  ): User!
+  ): User! @auth(type: "USER")
 }
 
 """Nested string filter"""
@@ -1162,13 +1162,13 @@ input UpdateStatusInput {
 """Update User input"""
 input UpdateUserInput {
   """User identifier"""
-  id: ID
+  id: ID @auth(type: "USER", roles: ["ADMIN"])
   """User password"""
   password: NonEmptyString
   """User permissions"""
-  permissions: [UserPermissionEnum!]
+  permissions: [UserPermissionEnum!] @auth(type: "USER", roles: ["ADMIN"])
   """User roles"""
-  roles: [UserRoleEnum!]
+  roles: [UserRoleEnum!] @auth(type: "USER", roles: ["ADMIN"])
 }
 
 """User"""
