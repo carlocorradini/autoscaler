@@ -36,12 +36,13 @@ type Client struct {
 	graphQLClient graphql.Client
 }
 
-// ReclusterTransport transport.
-type ReclusterTransport struct {
-	// T is the HTTP round tripper.
-	T http.RoundTripper
-	// token is the auth token.
-	token string
+// Transport transport.
+type Transport struct {
+	// RoundTripper is the base RoundTripper used to make HTTP requests.
+	RoundTripper http.RoundTripper
+
+	// Token is the auth token
+	Token string
 }
 
 // NewClient represents a new client to call the API.
@@ -53,26 +54,22 @@ func NewClient(URL string, token string) (*Client, error) {
 
 	client := Client{
 		graphQLClient: graphql.NewClient(baseURL.String(), &http.Client{
-			Timeout:   GraphQLClientTimeout,
-			Transport: NewReclusterTransport(nil, token),
+			Timeout: GraphQLClientTimeout,
+			Transport: &Transport{
+				RoundTripper: http.DefaultTransport,
+				Token:        token,
+			},
 		}),
 	}
 
 	return &client, nil
 }
 
-// NewReclusterTransport generate new reCluster transport.
-func NewReclusterTransport(T http.RoundTripper, token string) *ReclusterTransport {
-	if T == nil {
-		T = http.DefaultTransport
-	}
-	return &ReclusterTransport{T, token}
-}
-
 // RoundTrip executes a single HTTP transaction, returning
 // a Response for the provided Request.
-func (t *ReclusterTransport) RoundTrip(req *http.Request) (*http.Response, error) {
-	req.Header.Set("User-Agent", GraphQLClientUserAgent)
-	req.Header.Set("Authorization", "Bearer "+t.token)
-	return t.RoundTrip(req)
+func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
+	req.Header.Add("User-Agent", GraphQLClientUserAgent)
+	req.Header.Add("Authorization", "Bearer"+t.Token)
+
+	return t.RoundTripper.RoundTrip(req)
 }
