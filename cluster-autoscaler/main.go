@@ -41,7 +41,7 @@ import (
 	cloudBuilder "k8s.io/autoscaler/cluster-autoscaler/cloudprovider/builder"
 	"k8s.io/autoscaler/cluster-autoscaler/config"
 	"k8s.io/autoscaler/cluster-autoscaler/core"
-	"k8s.io/autoscaler/cluster-autoscaler/core/filteroutschedulable"
+	"k8s.io/autoscaler/cluster-autoscaler/core/podlistprocessor"
 	"k8s.io/autoscaler/cluster-autoscaler/estimator"
 	"k8s.io/autoscaler/cluster-autoscaler/expander"
 	"k8s.io/autoscaler/cluster-autoscaler/metrics"
@@ -211,6 +211,8 @@ var (
 	skipNodesWithLocalStorage          = flag.Bool("skip-nodes-with-local-storage", true, "If true cluster autoscaler will never delete nodes with pods with local storage, e.g. EmptyDir or HostPath")
 	minReplicaCount                    = flag.Int("min-replica-count", 0, "Minimum number or replicas that a replica set or replication controller should have to allow their pods deletion in scale down")
 	nodeDeleteDelayAfterTaint          = flag.Duration("node-delete-delay-after-taint", 5*time.Second, "How long to wait before deleting a node after tainting it")
+	scaleDownSimulationTimeout         = flag.Duration("scale-down-simulation-timeout", 5*time.Minute, "How long should we run scale down simulation.")
+	parallelDrain                      = flag.Bool("parallel-drain", false, "Whether to allow parallel drain of nodes.")
 )
 
 func createAutoscalingOptions() config.AutoscalingOptions {
@@ -229,6 +231,9 @@ func createAutoscalingOptions() config.AutoscalingOptions {
 	parsedGpuTotal, err := parseMultipleGpuLimits(*gpuTotal)
 	if err != nil {
 		klog.Fatalf("Failed to parse flags: %v", err)
+	}
+	if *maxDrainParallelismFlag > 1 && !*parallelDrain {
+		klog.Fatalf("Invalid configuration, could not use --max-drain-parallelism > 1 if --parallel-drain is false")
 	}
 	return config.AutoscalingOptions{
 		NodeGroupDefaults: config.NodeGroupAutoscalingOptions{
@@ -307,6 +312,8 @@ func createAutoscalingOptions() config.AutoscalingOptions {
 		SkipNodesWithLocalStorage:          *skipNodesWithLocalStorage,
 		MinReplicaCount:                    *minReplicaCount,
 		NodeDeleteDelayAfterTaint:          *nodeDeleteDelayAfterTaint,
+		ScaleDownSimulationTimeout:         *scaleDownSimulationTimeout,
+		ParallelDrain:                      *parallelDrain,
 	}
 }
 
@@ -368,7 +375,10 @@ func buildAutoscaler(debuggingSnapshotter debuggingsnapshot.DebuggingSnapshotter
 
 	opts.Processors = ca_processors.DefaultProcessors()
 	opts.Processors.TemplateNodeInfoProvider = nodeinfosprovider.NewDefaultTemplateNodeInfoProvider(nodeInfoCacheExpireTime)
-	opts.Processors.PodListProcessor = filteroutschedulable.NewFilterOutSchedulablePodListProcessor(opts.PredicateChecker)
+	opts.Processors.PodListProcessor = podlistprocessor.NewDefaultPodListProcessor(
+		podlistprocessor.NewCurrentlyDrainedNodesPodListProcessor(),
+		podlistprocessor.NewFilterOutSchedulablePodListProcessor(opts.PredicateChecker),
+	)
 
 	var nodeInfoComparator nodegroupset.NodeInfoComparator
 	if len(autoscalingOptions.BalancingLabels) > 0 {
@@ -394,7 +404,6 @@ func buildAutoscaler(debuggingSnapshotter debuggingsnapshot.DebuggingSnapshotter
 
 	// These metrics should be published only once.
 	metrics.UpdateNapEnabled(autoscalingOptions.NodeAutoprovisioningEnabled)
-	metrics.UpdateMaxNodesCount(autoscalingOptions.MaxNodesTotal)
 	metrics.UpdateCPULimitsCores(autoscalingOptions.MinCoresTotal, autoscalingOptions.MaxCoresTotal)
 	metrics.UpdateMemoryLimitsBytes(autoscalingOptions.MinMemoryTotal, autoscalingOptions.MaxMemoryTotal)
 

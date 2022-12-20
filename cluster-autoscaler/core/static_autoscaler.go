@@ -23,6 +23,7 @@ import (
 
 	apiv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/labels"
+	"k8s.io/autoscaler/cluster-autoscaler/core/scaledown/planner"
 	scaledownstatus "k8s.io/autoscaler/cluster-autoscaler/core/scaledown/status"
 	"k8s.io/autoscaler/cluster-autoscaler/debuggingsnapshot"
 	schedulerframework "k8s.io/kubernetes/pkg/scheduler/framework"
@@ -52,6 +53,7 @@ import (
 	scheduler_utils "k8s.io/autoscaler/cluster-autoscaler/utils/scheduler"
 	"k8s.io/autoscaler/cluster-autoscaler/utils/taints"
 	"k8s.io/autoscaler/cluster-autoscaler/utils/tpu"
+	"k8s.io/utils/integer"
 
 	klog "k8s.io/klog/v2"
 )
@@ -175,9 +177,18 @@ func NewStaticAutoscaler(
 	actuator := actuation.NewActuator(autoscalingContext, clusterStateRegistry, ndt, deleteOptions)
 	autoscalingContext.ScaleDownActuator = actuator
 
-	// TODO: Remove the wrapper once the legacy implementation becomes obsolete.
-	scaleDownWrapper := legacy.NewScaleDownWrapper(scaleDown, actuator)
-	processorCallbacks.scaleDownPlanner = scaleDownWrapper
+	var scaleDownPlanner scaledown.Planner
+	var scaleDownActuator scaledown.Actuator
+	if opts.ParallelDrain {
+		scaleDownPlanner = planner.New(autoscalingContext, processors, deleteOptions)
+		scaleDownActuator = actuator
+	} else {
+		// TODO: Remove the wrapper once the legacy implementation becomes obsolete.
+		scaleDownWrapper := legacy.NewScaleDownWrapper(scaleDown, actuator)
+		scaleDownPlanner = scaleDownWrapper
+		scaleDownActuator = scaleDownWrapper
+	}
+	processorCallbacks.scaleDownPlanner = scaleDownPlanner
 
 	scaleUpResourceManager := scaleup.NewResourceManager(processors.CustomResourcesProcessor)
 
@@ -189,8 +200,8 @@ func NewStaticAutoscaler(
 		lastScaleUpTime:         initialScaleTime,
 		lastScaleDownDeleteTime: initialScaleTime,
 		lastScaleDownFailTime:   initialScaleTime,
-		scaleDownPlanner:        scaleDownWrapper,
-		scaleDownActuator:       scaleDownWrapper,
+		scaleDownPlanner:        scaleDownPlanner,
+		scaleDownActuator:       scaleDownActuator,
 		scaleUpResourceManager:  scaleUpResourceManager,
 		processors:              processors,
 		processorCallbacks:      processorCallbacks,
@@ -303,12 +314,18 @@ func (a *StaticAutoscaler) RunOnce(currentTime time.Time) errors.AutoscalerError
 		return errors.ToAutoscalerError(errors.CloudProviderError, err)
 	}
 
-	// Update node groups min/max after cloud provider refresh
+	// Update node groups min/max and maximum number of nodes being set for all node groups after cloud provider refresh
+	maxNodesCount := 0
 	for _, nodeGroup := range a.AutoscalingContext.CloudProvider.NodeGroups() {
 		metrics.UpdateNodeGroupMin(nodeGroup.Id(), nodeGroup.MinSize())
 		metrics.UpdateNodeGroupMax(nodeGroup.Id(), nodeGroup.MaxSize())
+		maxNodesCount += nodeGroup.MaxSize()
 	}
-
+	if a.MaxNodesTotal > 0 {
+		metrics.UpdateMaxNodesCount(integer.IntMin(a.MaxNodesTotal, maxNodesCount))
+	} else {
+		metrics.UpdateMaxNodesCount(maxNodesCount)
+	}
 	nonExpendableScheduledPods := core_utils.FilterOutExpendablePods(originalScheduledPods, a.ExpendablePodsPriorityCutoff)
 	// Initialize cluster state to ClusterSnapshot
 	if typedErr := a.initializeClusterSnapshot(allNodes, nonExpendableScheduledPods); typedErr != nil {
