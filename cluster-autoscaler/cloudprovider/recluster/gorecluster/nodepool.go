@@ -30,7 +30,11 @@ type UpdateNodePoolOpts = UpdateNodePoolInput
 type DeleteNodePoolNodeOpts struct{}
 
 // ListNodePools lists all the node pools.
-func (c *Client) ListNodePools(ctx context.Context, _ *ListNodePoolOpts) ([]NodePool, error) {
+func (c *Client) ListNodePools(ctx context.Context, opts *ListNodePoolOpts) ([]NodePool, error) {
+	if opts == nil {
+		opts = &ListNodePoolOpts{}
+	}
+
 	resp, err := NodePools(ctx, c.graphQLClient)
 	if err != nil {
 		return nil, err
@@ -41,6 +45,10 @@ func (c *Client) ListNodePools(ctx context.Context, _ *ListNodePoolOpts) ([]Node
 
 // UpdateNodePool updates a specific node pool.
 func (c *Client) UpdateNodePool(ctx context.Context, ID string, opts *UpdateNodePoolOpts) (*NodePool, error) {
+	if opts == nil {
+		opts = &UpdateNodePoolOpts{}
+	}
+
 	resp, err := UpdateNodePool(ctx, c.graphQLClient, ID, *opts)
 	if err != nil {
 		return nil, err
@@ -50,7 +58,11 @@ func (c *Client) UpdateNodePool(ctx context.Context, ID string, opts *UpdateNode
 }
 
 // DeleteNodePoolNode deletes a specific node from a node pool.
-func (c *Client) DeleteNodePoolNode(ctx context.Context, _ string, nodeID string, _ *DeleteNodePoolNodeOpts) (*Node, error) {
+func (c *Client) DeleteNodePoolNode(ctx context.Context, _ string, nodeID string, opts *DeleteNodePoolNodeOpts) (*Node, error) {
+	if opts == nil {
+		opts = &DeleteNodePoolNodeOpts{}
+	}
+
 	resp, err := UnassignNode(ctx, c.graphQLClient, nodeID)
 	if err != nil {
 		return nil, err

@@ -95,8 +95,9 @@ func NewManager(configReader io.Reader) (*Manager, error) {
 // Refresh refreshes the cache holding the node groups.
 func (m *Manager) Refresh() error {
 	ctx := context.Background()
+	opts := &gorecluster.ListNodePoolOpts{}
 
-	nodePools, err := m.client.ListNodePools(ctx, nil)
+	nodePools, err := m.client.ListNodePools(ctx, opts)
 	if err != nil {
 		return err
 	}

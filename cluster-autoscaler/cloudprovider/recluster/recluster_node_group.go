@@ -76,8 +76,9 @@ func (ng *NodeGroup) IncreaseSize(delta int) error {
 			currentSize, targetSize, ng.MaxSize())
 	}
 
+	ctx := context.Background()
 	opts := &gorecluster.UpdateNodePoolOpts{Count: uint(targetSize)}
-	nodePool, err := ng.client.UpdateNodePool(context.Background(), ng.id, opts)
+	nodePool, err := ng.client.UpdateNodePool(ctx, ng.id, opts)
 	if err != nil {
 		return err
 	}
@@ -119,7 +120,8 @@ func (ng *NodeGroup) DeleteNodes(nodes []*apiv1.Node) error {
 
 		klog.V(4).Infof("Deleting node %s", nodeID)
 
-		_, err = ng.client.DeleteNodePoolNode(ctx, ng.id, nodeID, nil)
+		opts := &gorecluster.DeleteNodePoolNodeOpts{}
+		_, err = ng.client.DeleteNodePoolNode(ctx, ng.id, nodeID, opts)
 		if err != nil {
 			return fmt.Errorf("failed to delete node %s from node pool %s: %w",
 				nodeID, ng.id, err)
