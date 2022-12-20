@@ -31,22 +31,18 @@ import (
 // configuration info and functions to control a set of nodes that have the
 // same capacity and set of labels.
 type NodeGroup struct {
-	id       string
 	client   Client
 	nodePool *gorecluster.NodePool
-
-	minSize int
-	maxSize int
 }
 
 // MaxSize returns maximum size of the node group.
 func (ng *NodeGroup) MaxSize() int {
-	return ng.maxSize
+	return ng.nodePool.MaxNodes
 }
 
 // MinSize returns minimum size of the node group.
 func (ng *NodeGroup) MinSize() int {
-	return ng.minSize
+	return ng.nodePool.MinNodes
 }
 
 // TargetSize returns the current target size of the node group. It is possible
@@ -78,7 +74,7 @@ func (ng *NodeGroup) IncreaseSize(delta int) error {
 
 	ctx := context.Background()
 	opts := &gorecluster.UpdateNodePoolOpts{Count: uint(targetSize)}
-	nodePool, err := ng.client.UpdateNodePool(ctx, ng.id, opts)
+	nodePool, err := ng.client.UpdateNodePool(ctx, ng.nodePool.ID, opts)
 	if err != nil {
 		return err
 	}
@@ -115,16 +111,16 @@ func (ng *NodeGroup) DeleteNodes(nodes []*apiv1.Node) error {
 		if err != nil {
 			// CA creates fake node objects to represent upcoming Nodes that haven't registered as nodes yet.
 			// We cannot delete the node at this point.
-			return fmt.Errorf("cannot delete node %s with provider ID %s on NodeGroup %s: %w", node.Name, node.Spec.ProviderID, ng.id, err)
+			return fmt.Errorf("cannot delete node %s with provider ID %s on NodeGroup %s: %w", node.Name, node.Spec.ProviderID, ng.nodePool.ID, err)
 		}
 
 		klog.V(4).Infof("Deleting node %s", nodeID)
 
 		opts := &gorecluster.DeleteNodePoolNodeOpts{}
-		_, err = ng.client.DeleteNodePoolNode(ctx, ng.id, nodeID, opts)
+		_, err = ng.client.DeleteNodePoolNode(ctx, ng.nodePool.ID, nodeID, opts)
 		if err != nil {
 			return fmt.Errorf("failed to delete node %s from node pool %s: %w",
-				nodeID, ng.id, err)
+				nodeID, ng.nodePool.ID, err)
 		}
 
 		ng.nodePool.Count--
@@ -156,7 +152,7 @@ func (ng *NodeGroup) DecreaseTargetSize(delta int) error {
 
 	ctx := context.Background()
 	opts := &gorecluster.UpdateNodePoolOpts{Count: uint(targetSize)}
-	nodePool, err := ng.client.UpdateNodePool(ctx, ng.id, opts)
+	nodePool, err := ng.client.UpdateNodePool(ctx, ng.nodePool.ID, opts)
 	if err != nil {
 		return err
 	}
@@ -172,7 +168,7 @@ func (ng *NodeGroup) DecreaseTargetSize(delta int) error {
 
 // Id returns an unique identifier of the node group.
 func (ng *NodeGroup) Id() string {
-	return ng.id
+	return ng.nodePool.ID
 }
 
 // Debug returns a string containing all information regarding this node group.

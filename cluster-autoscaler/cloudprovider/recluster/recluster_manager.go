@@ -108,15 +108,13 @@ func (m *Manager) Refresh() error {
 			continue
 		}
 
-		klog.V(4).Infof("Adding node pool %q, name: %s, min: %d, max: %d",
+		klog.V(4).Infof("Adding node pool %s, name: %s, min: %d, max: %d",
 			nodePool.ID, nodePool.Name, nodePool.MinNodes, nodePool.MaxNodes)
 
+		np := nodePool
 		nodeGroups = append(nodeGroups, &NodeGroup{
-			id:       nodePool.ID,
 			client:   m.client,
-			nodePool: &nodePool,
-			minSize:  nodePool.MinNodes,
-			maxSize:  nodePool.MaxNodes,
+			nodePool: &np,
 		})
 	}
 
