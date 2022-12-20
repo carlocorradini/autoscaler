@@ -38,7 +38,7 @@ jobs:
       - name: Build binaries
         working-directory: ${{ env.GOPATH }}/src/k8s.io/autoscaler/cluster-autoscaler
         run: |
-          make all
+          make BUILD_TAGS=recluster all
       - name: Build Docker amd64 image
         working-directory: ${{ env.GOPATH }}/src/k8s.io/autoscaler/cluster-autoscaler
         run: |
